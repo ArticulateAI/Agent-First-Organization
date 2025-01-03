@@ -1,0 +1,127 @@
+{
+    "Need Recognition": {
+        "Information Seeking": {
+            "Product Info": [
+                "What type of products do you provide?",
+                "Please give me a list of products I can buy from this platform?"
+            ],
+            "Brand Info": [
+                "The history about your store",
+                "What's your value proposition?"
+            ]
+        },
+        "Engagement": {
+            "Ad Clicks": [
+                "what's your current promotions/deals?"
+            ]
+        }
+    },
+    "Information Search": {
+        "Product Search and Discovery": {
+            "Search by Keywords": [
+                "I want to buy hat for my children"
+            ],
+            "Filter and Sort Options": [
+                "Is there any hat under 10 dollars"
+            ],
+            "Category Browsing": [
+                "I'm exploring the bed sheet options"
+            ],
+            "Personalized Recommendations": [
+                "If there is any new products coming out for my favorite blanket brand"
+            ]
+        },
+        "Product Inquiry": {
+            "Specifications": [
+                "what is the lowest price for throw blanket sold and delivered by your store?"
+            ],
+            "Availability": [
+                "When will this fleece blanket be available?"
+            ]
+        }
+    },
+    "Consideration": {
+        "Comparison": {
+            "Feature Comparison": [
+                "Compare bedding Set Solid Color Luxury and soft skin-friendly Flannel Duvet"
+            ],
+            "Price Comparison": [
+                "How much is soft skin-friendly Flannel Duvet again? compare with this Solid Color Luxury?"
+            ]
+        },
+        "Evaluation": {
+            "User Reviews": [
+                "Please pick the the top 5 most recent and worst review comment for this product"
+            ]
+        },
+        "Queries": {
+            "Customer Service Inquiry": [
+                "How can I contact the seller for this product?"
+            ],
+            "Product Clarifications": [
+                "What material is used for this pillow?",
+            ]
+        }
+    },
+    "Purchase Decision": {
+        "Checkout": {
+            "Payment and Billing": [
+                "I want to view my cart.",
+                "Take me to the checkout page."
+            ]
+        },
+        "Promotions": {
+            "Seasonal Offers": [
+                "Are there any promotions available right now?"
+            ]
+        },
+        "Transaction": {
+            "Payment Confirmation": [
+                "Do you receive my order request?"
+            ],
+            "Order Receipt": [
+                "Where I can get the receipt, I need it for reimbursement."
+            ]
+        },
+        "Shipping and Delivery": {
+            "Shipping Options": [
+                "What are the shipping options?"
+            ],
+            "Delivery Instructions": [
+                "I want the delivery guy to give me a call before delivery"
+            ]
+        }
+    },
+    "Post-Purchase Behavior": {
+        "Order Management": {
+            "Order Tracking": [
+                "Take me to the order tracking page",
+                "Where is my package now?",
+                "When will my package arrived?"
+            ],
+            "Order History": [
+                "I bought light pink hat before, please buy it again"
+            ],
+            "Order Cancellation": [
+                "I want to cancel the order"
+            ],
+            "Order Modification": [
+                "Oh, I want to change the address for my order"
+            ]
+        },
+        "Product Reviews and Feedback": {
+            "Writing Reviews": [
+                "How can I write reviews?"
+            ],
+            "Review Guidelines": [
+                "Whether the sellers know exactly who wrote the review? Can it be anonymous?"
+            ]
+        },
+        "Support": {
+            "Customer Service and Support": [
+                "The product sucks, I want to return!",
+                "Give me the human assistant!"
+            ]
+        }
+    }
+}

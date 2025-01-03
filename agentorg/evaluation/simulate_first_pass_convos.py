@@ -16,11 +16,13 @@ def conversation(model_api, goal, summary, model_params, synthetic_data_params):
     start_text = "Humans write short questions with typos and a neutral sentiment. Here are some examples of what a human customer would type: [how much is it?, Can you send info to my email, yes I need a job, want to check both proposals to rent and buy, How much does it cost a [PRODUCT_HERE], Im interested in [PRODUCT_HERE], hi i would like to rent out [PRODUCT_HERE] but im wondering which countries are available for rental]. Replicate the writing behavior of a human customer and begin the conversation with a question to achieve your goal."
     history.append({'role': 'system','content': instructional_prompt})
     history.append({'role': 'user', 'content': start_text})
-    
+    chatbot_history = []
+
     for i in range(synthetic_data_params['max_turns']):
         output = chatgpt_chatbot(history) 
         history.append({'role': 'assistant', 'content': output})
-        response_data = query_chatbot(model_api, history, model_params)
+        chatbot_history.append({'role': 'assistant', 'content': output})
+        response_data = query_chatbot(model_api, chatbot_history, model_params)
         answer = response_data["answer"]
         answer = answer.replace('\n', ' ')
         model_params = response_data["parameters"]
@@ -28,6 +30,7 @@ def conversation(model_api, goal, summary, model_params, synthetic_data_params):
         history[-1]['intent'] = pred_intent
 
         history.append({'role': 'user', 'content': answer})
+        chatbot_history.append({'role': 'user', 'content': answer})
         if i > 2 and check_goal_completion(goal, history.copy()):
             history.append({'goal_completetion': True})
             break
@@ -56,7 +59,7 @@ def simulate_conversations(model_api, model_params, synthetic_data_params, confi
         for stage, categories in cases.items():
             for first_level, second_levels in categories.items():
                 for second_level, goals in second_levels.items():
-                    raw_goal = random.choice(goals)
+                    raw_goal = goals[0]
                     raw_goals.append(raw_goal)
         
         # goal adaptation
@@ -71,6 +74,8 @@ def simulate_conversations(model_api, model_params, synthetic_data_params, confi
     try:
         conversations = generate_conversations(model_api, final_goals, summary, model_params, synthetic_data_params)
     except Exception as e:
+        print("Generate conversations failed")
+        print("Error: ", e)
         conversations = []
     return conversations, final_goals
 

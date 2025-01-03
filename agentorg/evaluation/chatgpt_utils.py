@@ -86,7 +86,7 @@ def filter_convo(convo, delim = '\n', filter_turns = True):
     return filtered_convo
 
 def adjust_goal(doc_content, goal):
-    message = f"Pretend you have the following goal in the mind. Given the following document content, please adjust your goal to the content. If the goal is not conflict with the document content, then don't need to change it and just copy the goal. The document content is as follows:\n{doc_content}\n\nThe original goal is as follows:\n{goal}\n\nPlease modify the goal to adapt it to the document content. Only give the answer to the question in your response."
+    message = f"Pretend you have the following goal in the mind. If the goal including some specific product, such as floss, mug, iphone, etc., then please replace it with the product from the following document content. Otherwise, don't need to change it and just return the original goal. The document content is as follows:\n{doc_content}\n\nThe original goal is as follows:\n{goal}\n\nOnly give the answer to the question in your response."
 
     return chatgpt_chatbot([{'role': 'user', 'content': message}], model=MODEL["model_type_or_path"])
 

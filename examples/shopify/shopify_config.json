@@ -3,7 +3,7 @@
     "user_objective": "The customer service assistant helps users with customer service inquiries. It can provide information about products, services, and policies, as well as help users resolve issues and complete transactions.",
     "builder_objective": "The customer service assistant helps to request customer's contact information.",
     "domain": "Ecommerce",
-    "intro": "",
+    "intro": "Awhale is an online retailer offering a curated selection of children's apparel and home accessories. Their product range includes kid's hats, aprons, bedding, pillows, throws, and comforters, all designed to combine functionality with appealing designs. Awhale emphasizes customer engagement by offering a 30% discount on first purchases for newsletter subscribers. For inquiries, customers can reach out via email at customer.service@awhaletrading.com. Awhale is active on social media platforms, including Facebook and Instagram, where they share exclusive offers and updates. Their website also features a blog that provides insights and tips related to their products, such as the versatility of their denim aprons. Awhale accepts various payment methods, including major credit cards and digital payment options like PayPal and Apple Pay, ensuring a secure and convenient shopping experience.",
     "task_docs": [
     ],
     "rag_docs": [

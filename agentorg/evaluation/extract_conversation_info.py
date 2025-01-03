@@ -23,7 +23,7 @@ def build_intent_graph(data):
     return G
 
 def check_bot_goal(convo, bot_goal):
-    convo_str = format_chat_history_str(flip_hist_content_only(convo[:-1]))
+    convo_str = format_chat_history_str(flip_hist_content_only(convo[:-2]))
     prompt = f"Here is a conversation between a user and a customer service chatbot assistant:\n{convo_str}\n\nThe chatbot's goal is the following: {bot_goal}\nOutput True if the bot was able to achieve its goal. Output False otherwise. Only output True or False and nothing else."
     output = chatgpt_chatbot([{'role': 'user', 'content': prompt}])
     return output == "True"
