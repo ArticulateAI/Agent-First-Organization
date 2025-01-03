@@ -46,6 +46,8 @@ class SlotFilling:
 
     def execute(self, slots:list, chat_history_str:str, metadata: dict) -> dict:
         logger.info(f"extracted slots: {slots}")
+        if not slots: return []
+        
         data = {
             "slots": [slot.dict() for slot in slots],
             "chat_history_str": chat_history_str

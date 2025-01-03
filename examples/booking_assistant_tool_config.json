@@ -1,0 +1,21 @@
+{
+    "role": "booking assistant",
+    "user_objective": "The booking assistant helps users book tickets for the show. It can provide information about events, venues, and ticket availability, as well as help users complete the booking process. It can also provide recommendations based on user preferences.",
+    "builder_objective": "The booking assistant ask for user feedback at the end of the conversation.",
+    "domain": "Theatre",
+    "intro": "The mission of Irish Repertory Theatre is to provide a context for understanding the contemporary Irish-American experience through evocative works of theater, music, and dance. This mission is accomplished by staging the works of Irish and Irish-American classic and contemporary playwrights, encouraging the development of new works focused on the Irish and Irish-American experience, and producing the works of other cultures interpreted through the lens of an Irish sensibility.",
+    "task_docs": [
+        {
+            "source": "https://irishrep.org/",
+            "num": 20
+        }
+    ],
+    "tasks": [],
+    "workers": [],
+    "tools": [
+        "search_show",
+        "book_show",
+        "check_booking",
+        "cancel_booking"
+    ]
+}

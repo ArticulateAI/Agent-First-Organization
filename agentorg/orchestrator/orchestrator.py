@@ -226,8 +226,9 @@ class AgentOrg:
                 action_spaces.append({"name": RESPOND_ACTION_NAME, "arguments": {RESPOND_ACTION_FIELD_NAME: response_state.get("message_flow", "") or response_state.get("response", "")}})
                 logger.info("Action spaces: " + json.dumps(action_spaces))
                 params_history_str = format_chat_history(params["history"])
+                logger.info(f"{params_history_str=}")
                 prompt = (
-                    sys_instruct + "\n#Available tools\n" + json.dumps(action_spaces) + REACT_INSTRUCTION + "\n\n" + "Conversations:\n" + params_history_str + "You current task is: " + node_info["attribute"].get("task", "") + "\nThougt:\n"
+                    sys_instruct + "\n#Available tools\n" + json.dumps(action_spaces) + REACT_INSTRUCTION + "\n\n" + "Conversations:\n" + params_history_str + "Your current task is: " + node_info["attribute"].get("task", "") + "\nThougt:\n"
                 )
                 messages: List[Dict[str, Any]] = [
                     {"role": "system", "content": prompt}

@@ -136,7 +136,7 @@ class TaskGraph(TaskGraphBase):
         logger.info(f"available_intents in _get_node: {available_intents}")
         logger.info(f"intent in _get_node: {intent}")
         candidates_intents = collections.defaultdict(list)
-        worker_name = self.graph.nodes[sample_node]["name"]
+        node_name = self.graph.nodes[sample_node]["name"]
         available_nodes[sample_node]["limit"] -= 1
         if intent and available_nodes[sample_node]["limit"] <= 0 and intent in available_intents:
             # delete the corresponding node item from the intent list
@@ -148,13 +148,12 @@ class TaskGraph(TaskGraphBase):
         params["curr_node"] = sample_node
         params["available_nodes"] = available_nodes
         params["available_intents"] = available_intents
-        worker_class = WORKER_REGISTRY.get(worker_name)
-        # TODO: This will be used to check whether we skip the worker or not, which is handled by the task graph framework
-        # skip = self._check_skip(worker_class, sample_node)
+        # TODO: This will be used to check whether we skip the worker/tool or not, which is handled by the task graph framework
+        # skip = self._check_skip(node_name, sample_node)
         # if skip:
         #     node_info = {"name": None, "attribute": None}
         # else:
-        node_info = {"name": worker_name, "attribute": self.graph.nodes[sample_node]["attribute"]}
+        node_info = {"name": node_name, "attribute": self.graph.nodes[sample_node]["attribute"]}
         
         return node_info, params, candidates_intents
 

@@ -58,7 +58,7 @@ def init_worker(args):
         ShopifyLoader.save(filepath_chunk, chunked_docs)
         
 
-    elif "DataBaseWorker" in workers:
+    elif any(("DataBaseWorker", "search_show", "book_show", "check_booking", "cancel_booking") in workers):
         logger.info("Initializing DataBaseWorker...")
         build_database(args.output_dir)
 

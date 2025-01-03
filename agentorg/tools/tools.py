@@ -13,28 +13,37 @@ TOOL_REGISTRY = {}
 logger = logging.getLogger(__name__)
 
     
-def register_tool(desc, slots=[], outputs=[]):
+def register_tool(desc, slots=[], outputs=[], isComplete=lambda x: True):
     def inner(func):
         """Decorator to register a worker."""
-        tool = lambda : Tool(func, desc, slots, outputs)
+        
+        tool = lambda : Tool(func, desc, slots, outputs, isComplete)
         TOOL_REGISTRY[f'{func.__name__}'] = tool
 
         return tool
     return inner
 
 class Tool:
-    def __init__(self, func, description, slots, outputs):
+    def __init__(self, func, description, slots, outputs, isComplete):
         self.func = func
         self.description = description
         self.output = outputs
         self.slotfillapi: SlotFilling = None
         self.info = self.get_info(slots)
         self.slots = self._format_slots(slots)
+        self.isComplete = isComplete
 
     def _format_slots(self, slots):
         format_slots = []
         for slot in slots:
-            format_slots.append(Slot(name=slot["name"], type=slot["type"], value="", description=slot["description"], prompt=slot["prompt"], required=slot.get("required", False)))
+            format_slots.append(Slot(
+                name=slot["name"], 
+                type=slot["type"], 
+                value="", 
+                description=slot["description"], 
+                prompt=slot["prompt"], 
+                required=slot.get("required", False)
+            ))
         return format_slots
 
     def get_info(self, slots):
@@ -63,9 +72,10 @@ class Tool:
         max_tries = 3
         while max_tries > 0 and "error" in response:
             chat_history_str = format_chat_history(state["trajectory"])
-            slots = self.slotfillapi.execute(self.slots, chat_history_str, state["metadata"])
+            slots : list[Slot] = self.slotfillapi.execute(self.slots, chat_history_str, state["metadata"])
+            logger.info(f'{slots=}')
             # if slot.value is not empty for all slots, then execute the tool
-            if all([slot.value for slot in slots]):
+            if all([slot.value for slot in slots if slot.required]):
                 logger.info("all slots filled")
                 for slot in slots:
                     if slot.type in ["list", "dict", "array"]:
@@ -82,17 +92,31 @@ class Tool:
                 response = self.func(**kwargs)
                 logger.info(f"Tool {self.func.__name__} response: {response}")
                 call_id = str(uuid.uuid4())
-                state["trajectory"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': json.dumps(kwargs), 'name': self.func.__name__}, 'id': call_id, 'type': 'function'}], 'function_call': None})
                 state["trajectory"].append({
-                            "role": "tool",
-                            "tool_call_id": call_id,
-                            "name": self.func.__name__,
-                            "content": response
+                    'content': None, 
+                    'role': 'assistant', 
+                    'tool_calls': [
+                        {
+                            'function': {
+                                'arguments': json.dumps(kwargs), 
+                                'name': self.func.__name__
+                            }, 
+                            'id': call_id, 
+                            'type': 'function'
+                        }
+                    ], 
+                    'function_call': None
+                })
+                state["trajectory"].append({
+                    "role": "tool",
+                    "tool_call_id": call_id,
+                    "name": self.func.__name__,
+                    "content": response
                 })
                 if "error" in response:
                     max_tries -= 1
                     continue
-                state["status"] = StatusEnum.COMPLETE
+                state["status"] = StatusEnum.COMPLETE if self.isComplete(response) else StatusEnum.INCOMPLETE
             else:
                 # tool_response is the slot.prompt of the first slot where slot.value is empty
                 for slot in slots:

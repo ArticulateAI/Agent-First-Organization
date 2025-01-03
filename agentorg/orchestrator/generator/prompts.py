@@ -157,7 +157,7 @@ Reasoning:
 """
 
 
-generate_best_practice_sys_prompt = """Given the background information about the chatbot, the task it needs to handle, and the available resources, your task is to generate a step-by-step best practice for addressing this task. Each step should represent a distinct interaction with the user, where the next step builds upon the user's response. Avoid breaking down sequences of internal worker actions within a single turn into multiple steps. Return the answer in JSON format.
+generate_best_practice_sys_prompt = """Given the background information about the chatbot, the task it needs to handle, and the available resources, your task is to generate a step-by-step best practice for addressing this task. Each step should represent a distinct interaction with the user, where the next step builds upon the user's response. Avoid breaking down sequences of internal worker actions within a single turn into multiple steps. Return the answer in JSON format. Only use resources listed in the input, resources listed in the Example may not be available.
 
 For example:
 Background: The builder want to create a chatbot - Customer Service Assistant. The customer service assistant typically handles tasks such as answering customer inquiries, making product recommendations, assisting with orders, processing returns and exchanges, supporting billing and payments, addressing complaints, and managing customer accounts.

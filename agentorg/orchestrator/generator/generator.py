@@ -262,7 +262,7 @@ class Generator:
             if not TOOL_REGISTRY.get(tool_name):
                 logger.error(f"Tool {tool_name} is not registered in the TOOL_REGISTRY")
                 continue
-            tool_desc = TOOL_REGISTRY.get(tool_name).description
+            tool_desc = TOOL_REGISTRY.get(tool_name)().description
             resources[tool_name] = tool_desc
             
         input_prompt = prompt.invoke({"best_practice": best_practice, "resources": resources})
@@ -281,7 +281,7 @@ class Generator:
                 node = []
                 node.append(str(node_id))
                 node.append({
-                    "name": step,
+                    "name": step['resource'],
                     # "name": "DefaultWorker", # Use DefaultWorker to decide which worker to use for specific task
                     "attribute": {
                         "value": step['example_response'],

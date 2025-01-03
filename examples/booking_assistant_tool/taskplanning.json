@@ -1,0 +1,57 @@
+[
+    {
+        "task_name": "Provide detailed information about upcoming events and shows",
+        "steps": [
+            "Greet the user and ask for their preferences or interests regarding upcoming events and shows (e.g., genre, location, date).",
+            "Using the provided preferences, retrieve a list of upcoming events and shows that match the user's interests.",
+            "Present the user with the curated list of events and provide detailed information about each event, including date, time, venue, and ticket availability.",
+            "Ask the user if they need more information about any specific event or if they would like additional options.",
+            "If the user requests more information, provide specific details about the selected event, such as performers, special features, and any promotional offers available."
+        ]
+    },
+    {
+        "task_name": "Provide information about venues and seating arrangements",
+        "steps": [
+            "Inquire about the specific event or venue the user is interested in.",
+            "Retrieve and provide detailed information about the venue, including seating arrangements and any special features.",
+            "Ask if the user needs further details on seating options, such as accessibility or premium seating.",
+            "Confirm if the user would like to proceed with booking or needs additional assistance.",
+            "Provide guidance on the next steps for booking tickets or additional recommendations if needed."
+        ]
+    },
+    {
+        "task_name": "Check and inform about the availability of tickets for specific shows",
+        "steps": [
+            "Check and inform about the availability of tickets for specific shows"
+        ]
+    },
+    {
+        "task_name": "Assist in the ticket booking process",
+        "steps": [
+            "Greet the user and inquire about the event or show they are interested in booking tickets for.",
+            "Ask the user if they have any specific preferences or requirements, such as date, time, seating preference, or price range.",
+            "Provide information about available events and show options that match the user's preferences.",
+            "Ask the user to confirm their selection and provide any additional details needed for booking, such as the number of tickets.",
+            "Guide the user through the booking process, including payment details and confirmation.",
+            "Confirm the booking and provide the user with the ticket details and any additional information they may need for their event."
+        ]
+    },
+    {
+        "task_name": "Provide personalized show recommendations based on user preferences",
+        "steps": [
+            "Retrieve the user's preferences and history regarding past shows, genres, and favorite venues using the available resources.",
+            "Inquire about any specific preferences or requirements for the new booking, such as preferred dates, genres, or artists.",
+            "Generate a list of personalized show recommendations based on the user's preferences and available shows.",
+            "Present the recommended shows to the user and ask if any of them are of interest or if they would like more options.",
+            "Confirm the user's selection and provide further details about the show, such as venue location and ticket availability.",
+            "Assist the user with the booking process, providing step-by-step guidance on selecting seats and completing the ticket purchase."
+        ]
+    },
+    {
+        "task_name": "Aid the user in checking information on previous bookings",
+        "steps": [
+            "Retrieve the user's booking history and answer any inquiries the user may have.",
+            "Follow up on the user in case they have any new questions"
+        ]
+    }
+]
