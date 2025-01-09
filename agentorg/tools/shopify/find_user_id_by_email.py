@@ -23,7 +23,10 @@ outputs = [
     }
 ]
 
-@register_tool(description, slots, outputs)
+USER_NOT_FOUND_ERROR = "error: user not found"
+MULTIPLE_USERS_SAME_EMAIL_ERROR = "error: there are multiple users with the same email"
+
+@register_tool(description, slots, outputs, lambda x: x not in [USER_NOT_FOUND_ERROR, MULTIPLE_USERS_SAME_EMAIL_ERROR])
 def find_user_id_by_email(email: str) -> str:
     user_id = ""
     try:
@@ -43,6 +46,6 @@ def find_user_id_by_email(email: str) -> str:
             user_id = nodes[0]["node"]["id"]
             return user_id
         else:
-            return "error: there are multiple users with the same email"
+            return MULTIPLE_USERS_SAME_EMAIL_ERROR
     except Exception as e:
-        return "error: user not found"
+        return USER_NOT_FOUND_ERROR
