@@ -1,0 +1,24 @@
+{
+    "role": "shopping assistant",
+    "user_objective": 
+    "Be able to answer these type of questions.\n - What type of products do you provide? \n - Please give me a list of products I can buy from this platform?\n - The history about your store\n - What's your value proposition?\n - what's your current promotions/deals?\n - I want to buy hat for my children\n - Is there any hat under 10 dollars\n - I'm exploring the bed sheet options\n - If there is any new products coming out for my favorite blanket brand\n - what is the lowest price for throw blanket sold and delivered by your store?\n - When will this fleece blanket be available?\n - Compare bedding Set Solid Color Luxury and soft skin-friendly Flannel Duvet\n - How much is soft skin-friendly Flannel Duvet again? compare with this Solid Color Luxury?\n - Please pick the the top 5 most recent and worst review comment for this product\n - How can I contact the seller for this product?\n - What material is used for this pillow?\n - I want to view my cart.\n - Take me to the checkout page.\n - Are there any promotions available right now?\n - Do you receive my order request?\n - Where I can get the receipt, I need it for reimbursement.\n - What are the shipping options?\n - I want the delivery guy to give me a call before delivery\n - Take me to the order tracking page\n - Where is my package now?\n - When will my package arrived?\n - I bought light pink hat before, please buy it again\n - Oh, I want to change the address for my order\n - How can I write reviews?\n - Whether the sellers know exactly who wrote the review? Can it be anonymous?\n - The product sucks, I want to return!\n - Give me the human assistant!"
+    ,
+    "builder_objective": "",
+    "domain": "Ecommerce",
+    "intro": "Awhale is an online retailer offering a curated selection of children's apparel and home accessories. Their product range includes kid's hats, aprons, bedding, pillows, throws, and comforters, all designed to combine functionality with appealing designs. Awhale emphasizes customer engagement by offering a 30% discount on first purchases for newsletter subscribers. For inquiries, customers can reach out via email at customer.service@awhaletrading.com. Awhale is active on social media platforms, including Facebook and Instagram, where they share exclusive offers and updates. Their website also features a blog that provides insights and tips related to their products, such as the versatility of their denim aprons. Awhale accepts various payment methods, including major credit cards and digital payment options like PayPal and Apple Pay, ensuring a secure and convenient shopping experience.",
+    "task_docs": [],
+    "rag_docs": [],
+    "tasks": [],
+    "workers": [],
+    "tools": [
+        "find_user_id_by_email",
+        "get_collection",
+        "get_order",
+        "get_products",
+        "get_user_details",
+        "preview_collections",
+        "preview_orders",
+        "search_collections",
+        "search_products"
+    ]
+}

@@ -1,0 +1,102 @@
+[
+    {
+        "task_name": "Provide product information and list",
+        "steps": [
+            "Greet the user and inquire about the specific type of product information or list they are interested in.",
+            "If the user is asking about general product categories or availability, provide a list of product categories available on the platform using the available resources.",
+            "If the user requests information about a specific product (e.g., materials, prices, availability), provide detailed information about the product using the available resources.",
+            "If the user requests a list of products based on specific criteria (e.g., price range, brand), provide a curated list of products that match the criteria using the available resources.",
+            "Ask the user if they need further assistance or additional information regarding the products provided."
+        ]
+    },
+    {
+        "task_name": "Provide product search and recommendations",
+        "steps": [
+            "Welcome the user and ask for specific preferences or requirements (e.g., product category, brand, price range) to tailor the search.",
+            "Use internal resources to access the company's product database and retrieve a list of products that match the user's preferences.",
+            "Present the curated list of products to the user, highlighting key features and any current promotions or deals.",
+            "Ask the user if they would like more information on any product, need additional options, or have further questions.",
+            "Based on user response, provide detailed product information, additional recommendations, or assist with next steps like adding items to the cart or checkout."
+        ]
+    },
+    {
+        "task_name": "Provide information on promotions and deals",
+        "steps": [
+            "Provide information on promotions and deals"
+        ]
+    },
+    {
+        "task_name": "Provide product comparison and pricing details",
+        "steps": [
+            "Inquire about the specific products the user wants to compare or get pricing details for, including any relevant product identifiers or names.",
+            "Use the ProductWorker to access the company's database and retrieve detailed information about the specified products, including pricing, specifications, and availability.",
+            "Present the user with a comparison of the specified products, highlighting key features, differences, and pricing information.",
+            "Ask the user if they need further assistance, such as more detailed specifications, additional product options, or help with making a purchase decision.",
+            "Provide the user with guidance on how to proceed with purchasing, saving the comparison for future reference, or exploring more products if needed."
+        ]
+    },
+    {
+        "task_name": "Provide order management and receipt retrieval",
+        "steps": [
+            "Use MessageWorker to greet the user and ask for their order details or order ID to assist with order management.",
+            "Use RAGWorker to retrieve the company's internal documentation on order management and receipt retrieval policies.",
+            "Use ProductWorker to access the order database and retrieve the current status of the user's order and information on any available receipts.",
+            "Communicate the order status and receipt retrieval options to the user using MessageWorker, and ask if they need further assistance or have any specific requests.",
+            "If the user wants to change the address or make any modifications, guide them through the process using MessageWorker and confirm the changes.",
+            "If the user requests to speak with a human assistant, provide contact information or escalate the issue to a live agent using MessageWorker."
+        ]
+    },
+    {
+        "task_name": "Provide shipping options and tracking information",
+        "steps": [
+            "Provide shipping options and tracking information"
+        ]
+    },
+    {
+        "task_name": "Provide customer support and contact information",
+        "steps": [
+            "Greet the user and ask for the specific issue they need support with, such as product inquiries, order issues, or returns.",
+            "If the user needs information about contacting the store or customer service, provide the contact details such as email, phone number, or a link to live chat.",
+            "If the user has a specific issue (e.g., order tracking, returns), guide them to the appropriate resource or process, such as a self-service portal or FAQ page.",
+            "If the user's issue is unresolved or requires human intervention, offer to connect them with a human assistant or provide an escalation path.",
+            "Confirm with the user if their issue has been addressed or if they need further assistance."
+        ]
+    },
+    {
+        "task_name": "Provide review writing and analysis",
+        "steps": [
+            "Inquire if the user wants guidance on how to write a review or if they want an analysis of existing reviews.",
+            "If the user wants guidance on writing a review, provide instructions on accessing the review section and tips on writing an effective review.",
+            "If the user wants analysis of existing reviews, ask which product they are interested in.",
+            "Retrieve the reviews for the specified product and provide an analysis, such as highlighting common themes, the most positive and negative aspects, and average ratings.",
+            "Ask if the user needs further assistance or if they would like help with anything else."
+        ]
+    },
+    {
+        "task_name": "Process returns and exchanges",
+        "steps": [
+            "Inquire about the reason for the return or exchange to understand the customer's issue and determine the appropriate process.",
+            "Check the company's return and exchange policy using RAGWorker to ensure the request is eligible.",
+            "Retrieve the order details and history using UserProfileWorker to verify the purchase and gather necessary information.",
+            "Provide the customer with the instructions and options available for the return or exchange, including any shipping details or deadlines.",
+            "Ask if the customer needs assistance with any additional steps, such as preparing the item for return or selecting a replacement product.",
+            "Confirm the initiation of the return or exchange process and provide a reference number or confirmation email as proof of the request.",
+            "Offer to connect the customer with a human assistant if they need further assistance or have additional questions."
+        ]
+    },
+    {
+        "task_name": "Provide cart management and checkout assistance",
+        "steps": [
+            "Ask the user if they want to view the contents of their cart or proceed directly to checkout.",
+            "If the user wants to view the cart, display the current items in the cart, including product details, quantities, and total cost.",
+            "Allow the user to modify the cart by adding or removing items, or updating quantities. Confirm any changes made.",
+            "Ask the user if they have any promo codes or discounts they would like to apply to the cart.",
+            "Provide the option to proceed to the checkout page and confirm the user's shipping and billing information.",
+            "Ask the user if they have any specific delivery instructions or preferences, such as a preferred delivery time or contact method.",
+            "Review the final order summary with the user, including all costs and applied discounts, before confirming the purchase.",
+            "Assist the user in completing the payment process, ensuring secure and smooth transaction handling.",
+            "Confirm the order placement and provide the user with an order confirmation number and details on how to track their order.",
+            "Offer assistance with any additional questions or provide contact information for further support."
+        ]
+    }
+]

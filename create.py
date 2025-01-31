@@ -13,16 +13,16 @@ from langchain_openai import ChatOpenAI
 from agentorg.utils.utils import init_logger
 from agentorg.orchestrator.orchestrator import AgentOrg
 from agentorg.orchestrator.generator.generator import Generator
-from agentorg.tools.RAG.build_rag import build_rag
-from agentorg.tools.database.build_database import build_database
+from agentorg.env.tools.RAG.build_rag import build_rag
+from agentorg.env.tools.database.build_database import build_database
 from agentorg.utils.model_config import MODEL
 
 logger = init_logger(log_level=logging.INFO, filename=os.path.join(os.path.dirname(__file__), "logs", "agentorg.log"))
 load_dotenv()
 
 API_PORT = "55135"
-NLUAPI_ADDR = f"http://localhost:{API_PORT}/nlu/predict"
-SLOTFILLAPI_ADDR = f"http://localhost:{API_PORT}/slotfill/predict"
+NLUAPI_ADDR = f"http://localhost:{API_PORT}/nlu"
+SLOTFILLAPI_ADDR = f"http://localhost:{API_PORT}/slotfill"
 
 def generate_taskgraph(args):
     model = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)

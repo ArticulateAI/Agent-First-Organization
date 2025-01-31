@@ -10,11 +10,11 @@
     ],
     "tasks": [],
     "workers": [
-        "RAGWorker"
+        {"id": "40f05456-525c-4d9d-ac37-54482d6b220b", "name": "FaissRAGWorker", "path": "faiss_rag_worker.py"}
     ],
     "tools": [
-        "find_user_by_email",
-        "get_order_details",
-        "get_product_details"
+        {"id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b", "name": "find_user_id_by_email", "path": "shopify/find_user_id_by_email.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
+        {"id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443", "name": "get_user_details", "path": "shopify/get_user_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
+        {"id": "2a2750cb-6226-4068-ba05-a4db83da3e16", "name": "get_order_details", "path": "shopify/get_order_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}}
     ]
 }

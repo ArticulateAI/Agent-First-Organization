@@ -3,7 +3,10 @@
         [
             "0",
             {
-                "name": "MessageAgent",
+                "resource": {
+                    "id": "26bb6634-3bee-417d-ad75-23269ac17bc3",
+                    "name": "MessageWorker"
+                },
                 "attribute": {
                     "value": "Hello! Welcome to our Shopping Assistant. How can I assist you today?",
                     "task": "start message",
@@ -15,8 +18,11 @@
         ],
         [
             "1",
-            {
-                "name": "find_user_id_by_email",
+            {   
+                "resource": {
+                    "id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b",
+                    "name": "find_user_id_by_email"
+                },
                 "attribute": {
                     "value": "",
                     "task": "Find user id by email",
@@ -28,7 +34,10 @@
         [
             "2",
             {
-                "name": "Planner",
+                "resource": {
+                    "id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443",
+                    "name": "get_user_details"
+                },
                 "attribute": {
                     "value": "",
                     "task": "Find order id by user id",
@@ -40,7 +49,10 @@
         [
             "3",
             {
-                "name": "get_order_details",
+                "resource": {
+                    "id": "2a2750cb-6226-4068-ba05-a4db83da3e16",
+                    "name": "get_order_details"
+                },
                 "attribute": {
                     "value": "",
                     "task": "Get the product id for each order",
@@ -50,21 +62,12 @@
             }
         ],
         [
-            "4",
-            {
-                "name": "get_product_details",
-                "attribute": {
-                    "value": "",
-                    "task": "Get the product information",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
             "5",
             {
-                "name": "RAGWorker",
+                "resource": {
+                    "id": "40f05456-525c-4d9d-ac37-54482d6b220b",
+                    "name": "FaissRAGWorker"
+                },
                 "attribute": {
                     "value": "",
                     "task": "Answer user's question about product",
@@ -115,19 +118,6 @@
             }
         ],
         [
-            "3",
-            "4",
-            {
-                "intent": "None",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
-            }
-        ],
-        [
             "0",
             "5",
             {
@@ -145,20 +135,21 @@
     "user_objective": "The customer service assistant helps users with customer service inquiries. It can provide information about products, services, and policies, as well as help users resolve issues and complete transactions.",
     "builder_objective": "The customer service assistant helps to request customer's contact information.",
     "domain": "Ecommerce",
-    "intro": "",
+    "intro": "Awhale is an online retailer offering a curated selection of children's apparel and home accessories. Their product range includes kid's hats, aprons, bedding, pillows, throws, and comforters, all designed to combine functionality with appealing designs. Awhale emphasizes customer engagement by offering a 30% discount on first purchases for newsletter subscribers. For inquiries, customers can reach out via email at customer.service@awhaletrading.com. Awhale is active on social media platforms, including Facebook and Instagram, where they share exclusive offers and updates. Their website also features a blog that provides insights and tips related to their products, such as the versatility of their denim aprons. Awhale accepts various payment methods, including major credit cards and digital payment options like PayPal and Apple Pay, ensuring a secure and convenient shopping experience.",
     "task_docs": [
     ],
     "rag_docs": [
     ],
     "tasks": [],
     "tools": [
-        "find_user_by_email",
-        "get_order_details",
-        "get_product_details"
+        {"id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b", "name": "find_user_id_by_email", "path": "shopify/find_user_id_by_email.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
+        {"id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443", "name": "get_user_details", "path": "shopify/get_user_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
+        {"id": "2a2750cb-6226-4068-ba05-a4db83da3e16", "name": "get_order_details", "path": "shopify/get_order_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}}
     ],
     "workers": [
-        "RAGWorker"
+        {"id": "26bb6634-3bee-417d-ad75-23269ac17bc3", "name": "MessageWorker","path": "message_worker.py"},
+        {"id": "40f05456-525c-4d9d-ac37-54482d6b220b", "name": "FaissRAGWorker", "path": "faiss_rag_worker.py"}
     ],
-    "nluapi": "http://localhost:55135/nlu/predict",
-    "slotfillapi": "http://localhost:55135/slotfill/predict"
+    "nluapi": "http://localhost:55135/nlu",
+    "slotfillapi": "http://localhost:55135/slotfill"
 }

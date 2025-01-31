@@ -1,0 +1,271 @@
+{
+    "nodes": [
+        [
+            "0",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "Hello! I'm your College Student Assistant. What can I help you with today? Whether it's about assignments, exam schedules, or course policies, I'm here to assist you!",
+                    "task": "start message",
+                    "directed": false
+                },
+                "limit": 1,
+                "type": "start"
+            }
+        ],
+        [
+            "1",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "Here is the course schedule for the upcoming semester. By signing up for our additional services or memberships, you can enjoy benefits such as priority registration and exclusive access to study materials.",
+                    "task": "Provide course schedule information while highlighting any benefits related to signing up for additional services or memberships.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "2",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "The assignment deadline is clearly stated as October 31st. To help you meet this deadline, we offer a range of resources including access to expert consultations and online guides. Would you like more information on these resources?",
+                    "task": "Provide assignment deadline information clearly and highlight any benefits or resources available through our services to help meet this deadline.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "3",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "Here is your exam schedule for the upcoming semester. Additionally, you might find our study resources and tutoring services helpful to prepare effectively.",
+                    "task": "Provide exam schedule information and highlight any benefits of additional services or tools that could assist in exam preparation.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "4",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "Here are the course policies: [policy details]. These policies are designed to ensure that we meet our builder's objectives by maintaining high standards and providing a consistent learning experience.",
+                    "task": "Provide course policy information and highlight how the policies align with the builder's objectives.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "5",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "I've identified your current courses and upcoming deadlines. Let's get you organized!",
+                    "task": "Identify the user's current courses and any upcoming deadlines or important dates using the RAGWorker to access internal documentation and gather relevant details.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "6",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "Here is a summary of your upcoming coursework deadlines and any important updates.",
+                    "task": "Provide the user with a summary of upcoming coursework deadlines and any important updates or changes to their schedule using the MessageWorker to deliver this information.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "7",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "Would you like reminders for specific assignments or exams? How would you like to receive them?",
+                    "task": "Ask the user if they need reminders for specific assignments or exams and how they would like to receive these reminders (e.g., daily, weekly, specific time).",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "8",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "Your personalized reminders have been set up as per your preferences. You will receive them accordingly.",
+                    "task": "Set up personalized reminders based on the user's preferences and confirm with the user that the reminders have been scheduled.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "9",
+            {
+                "name": "DefaultWorker",
+                "attribute": {
+                    "value": "If you need help with any assignments or need study resources, feel free to ask!",
+                    "task": "Offer additional assistance, such as answering questions about specific assignments or providing study resources, to support the user in managing their coursework.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ]
+    ],
+    "edges": [
+        [
+            "0",
+            "1",
+            {
+                "intent": "User wants information about course schedules",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "2",
+            {
+                "intent": "User has inquiries about assignment deadlines",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "3",
+            {
+                "intent": "User wants to know exam dates",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "4",
+            {
+                "intent": "User needs clarification on course policies",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "5",
+            {
+                "intent": "User requests reminders or updates about coursework",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "5",
+            "6",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "6",
+            "7",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "7",
+            "8",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "8",
+            "9",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ]
+    ],
+    "role": "college student assistant",
+    "user_objective": "The college student assistant helps a student with inquires related to their coursework. It can provide information about dates, assignments, exams, and policies.",
+    "builder_objective": "",
+    "domain": "academics",
+    "intro": "The mission of college is to learn. A student will be in many courses at once and has a lot to juggle. This student is in the following classes: 1) Natural Language Processing; 2) Latin American Civilization.",
+    "task_docs": [],
+    "rag_docs": [
+        {
+            "source": "https://pastebin.com/raw/xf9qQiRx",
+            "desc": "Plaintext syllabus for the Natural Language Processing course.",
+            "num": 1
+        },
+        {
+            "source": "https://pastebin.com/raw/VLHLHgVc",
+            "desc": "Plaintext syllabus for the Latin American Civilization course.",
+            "num": 1
+        }
+    ],
+    "tasks": [],
+    "workers": [
+        "RAGWorker",
+        "RagMsgWorker",
+        "MessageWorker",
+        "DefaultWorker"
+    ],
+    "nluapi": "http://localhost:55135/nlu/predict",
+    "slotfillapi": "http://localhost:55135/slotfill/predict"
+}

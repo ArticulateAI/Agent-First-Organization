@@ -1,0 +1,1141 @@
+{
+    "nodes": [
+        [
+            "0",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "Hello and welcome to our Shopping Assistant! I'm here to help you with all your shopping needs. Whether you're looking for product recommendations, exploring our current promotions, or need assistance with your orders, feel free to ask. How can I assist you today?",
+                    "task": "start message",
+                    "directed": false
+                },
+                "limit": 1,
+                "type": "start"
+            }
+        ],
+        [
+            "1",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "Hello! How can I assist you today? Are you looking for information on a specific product or a category?",
+                    "task": "Greet the user warmly and inquire about the specific type of product information or list they are interested in, ensuring a friendly and helpful tone.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "2",
+            {
+                "name": "preview_collections",
+                "attribute": {
+                    "value": "Here is a list of product categories we offer: Electronics, Home Appliances, Fashion, and more. Which category are you interested in?",
+                    "task": "If the user is asking about general product categories or availability, provide a comprehensive and easily navigable list of product categories available on the platform using the available resources.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "3",
+            {
+                "name": "get_products",
+                "attribute": {
+                    "value": "The product you're interested in is available in stock. It features high-quality materials and is priced at $299. Would you like to know more?",
+                    "task": "If the user requests information about a specific product (e.g., materials, prices, availability), provide detailed and accurate information about the product using the available resources, highlighting any unique features or benefits.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "4",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "Here are some products that match your criteria: Product A, Product B, and Product C. We also have a special promotion on Product B this week!",
+                    "task": "If the user requests a list of products based on specific criteria (e.g., price range, brand), provide a curated list of products that match the criteria using the available resources, and suggest any special deals or promotions if applicable.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "5",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Is there anything else I can help you with today? Please feel free to ask if you need more information.",
+                    "task": "Ask the user if they need further assistance or additional information regarding the products provided, ensuring they feel supported and valued.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "6",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Welcome! Could you please share your preferences or requirements for the product you are looking for? Also, have you considered our Prime membership for exclusive benefits?",
+                    "task": "Welcome the user and ask for specific preferences or requirements (e.g., product category, brand, price range) to tailor the search. Mention the benefits of a Prime membership if applicable to their interests.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "7",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "",
+                    "task": "Use internal resources to access the company's product database and retrieve a list of products that match the user's preferences. Highlight any exclusive Prime deals or benefits available.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "8",
+            {
+                "name": "preview_collections",
+                "attribute": {
+                    "value": "Here is a list of products that match your preferences. Check out these exclusive Prime deals and features!",
+                    "task": "Present the curated list of products to the user, highlighting key features and any current promotions or deals, especially those exclusive to Prime members.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "9",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "Would you like more information on any of these products, or do you have further questions? Our Prime membership offers even more exclusive benefits!",
+                    "task": "Ask the user if they would like more information on any product, need additional options, or have further questions. Offer additional insights into the advantages of Prime membership based on their interests.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "10",
+            {
+                "name": "get_products",
+                "attribute": {
+                    "value": "Here are the detailed product specifications. Let me know if you\u2019d like to add items to your cart or proceed to checkout. Signing up for Prime could enhance your shopping experience with exclusive perks!",
+                    "task": "Based on user response, provide detailed product information, additional recommendations, or assist with next steps like adding items to the cart or checkout. Encourage the user to consider signing up for a Prime membership for optimal benefits.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "11",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "Here are some exciting promotions and deals we have currently. By signing up for our Prime membership, you can enjoy exclusive offers and discounts on these products.",
+                    "task": "Provide information on promotions and deals, emphasizing the benefits of signing up for the Prime membership to avail exclusive offers.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "12",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "Could you please provide the names or identifiers of the products you want to compare?",
+                    "task": "Inquire about the specific products the user wants to compare or get pricing details for, including any relevant product identifiers or names.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "13",
+            {
+                "name": "get_products",
+                "attribute": {
+                    "value": "",
+                    "task": "Use the ProductWorker to access the company's database and retrieve detailed information about the specified products, including pricing, specifications, and availability.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "14",
+            {
+                "name": "get_products",
+                "attribute": {
+                    "value": "Here is a comparison of the products you specified, highlighting their key features and pricing differences.",
+                    "task": "Present the user with a comparison of the specified products, highlighting key features, differences, and pricing information.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "15",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "Do you need further assistance with detailed specifications, more product options, or any help with making a purchase decision?",
+                    "task": "Ask the user if they need further assistance, such as more detailed specifications, additional product options, or help with making a purchase decision.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "16",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "You can proceed to purchase by following the checkout process. If you want to save this comparison for future reference or explore more products, let me know.",
+                    "task": "Provide the user with guidance on how to proceed with purchasing, saving the comparison for future reference, or exploring more products if needed.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "17",
+            {
+                "name": "get_order",
+                "attribute": {
+                    "value": "Here are your available shipping options: Standard Shipping (5-7 business days), Expedited Shipping (2-3 business days), and Premium Shipping (Next day delivery). Premium Shipping ensures your package arrives the fastest and comes with additional tracking features.",
+                    "task": "Provide shipping options and tracking information, while highlighting the benefits of any premium shipping services.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "18",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Hello! How can I assist you today? Are you looking for help with product inquiries, order issues, or maybe returns?",
+                    "task": "Greet the user warmly and ask for the specific issue they need support with, such as product inquiries, order issues, or returns, ensuring a personalized interaction.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "19",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "You can reach our customer service at support@example.com or call us at (123) 456-7890. We also have a live chat option available on our website for immediate assistance.",
+                    "task": "If the user needs information about contacting the store or customer service, promptly provide the contact details such as email, phone number, or a link to live chat, emphasizing quick and easy access to support.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "20",
+            {
+                "name": "preview_orders",
+                "attribute": {
+                    "value": "Let me help you with that. You can track your order status or initiate a return through our self-service portal here: [link].",
+                    "task": "If the user has a specific issue (e.g., order tracking, returns), efficiently guide them to the appropriate resource or process, such as a self-service portal or FAQ page, ensuring they feel supported throughout the process.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "21",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "It seems like this issue requires further assistance. Would you like me to connect you with one of our human assistants for personalized support?",
+                    "task": "If the user's issue is unresolved or requires human intervention, offer to connect them with a human assistant or provide an escalation path, ensuring a smooth transition to personalized support.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "22",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Have we resolved your issue, or is there anything else I can assist you with today?",
+                    "task": "Confirm with the user if their issue has been addressed or if they need further assistance, ensuring complete satisfaction with the resolution provided.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "23",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "Would you like guidance on writing a review or are you interested in an analysis of existing reviews?",
+                    "task": "Inquire if the user wants guidance on how to write a review or if they want an analysis of existing reviews.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "24",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "To write a review, go to the product page, scroll to the reviews section, and click on 'Write a Review'. Be sure to include specific details and your honest opinion.",
+                    "task": "If the user wants guidance on writing a review, provide instructions on accessing the review section and tips on writing an effective review.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "25",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "Which product would you like an analysis of the reviews for?",
+                    "task": "If the user wants analysis of existing reviews, ask which product they are interested in.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "26",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "The reviews for the product you mentioned highlight that users love the design and functionality but have noted issues with battery life. The average rating is 4.2 out of 5.",
+                    "task": "Retrieve the reviews for the specified product and provide an analysis, such as highlighting common themes, the most positive and negative aspects, and average ratings.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "27",
+            {
+                "name": "MessageWorker",
+                "attribute": {
+                    "value": "Is there anything else I can help you with today?",
+                    "task": "Ask if the user needs further assistance or if they would like help with anything else.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "28",
+            {
+                "name": "find_user_id_by_email",
+                "attribute": {
+                    "value": "Could you please let us know the reason for your return or exchange?",
+                    "task": "Inquire about the reason for the return or exchange to understand the customer's issue and determine the appropriate process.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "29",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Let me check our return and exchange policy to ensure your request is eligible.",
+                    "task": "Check the company's return and exchange policy using RAGWorker to ensure the request is eligible.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "30",
+            {
+                "name": "get_order",
+                "attribute": {
+                    "value": "I will retrieve your order details to verify the purchase and gather the necessary information.",
+                    "task": "Retrieve the order details and history using UserProfileWorker to verify the purchase and gather necessary information.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "31",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Here are the instructions and options available for your return or exchange, including shipping details and deadlines.",
+                    "task": "Provide the customer with the instructions and options available for the return or exchange, including any shipping details or deadlines.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "32",
+            {
+                "name": "get_products",
+                "attribute": {
+                    "value": "Do you need help with any additional steps, like preparing the item for return or selecting a replacement product?",
+                    "task": "Ask if the customer needs assistance with any additional steps, such as preparing the item for return or selecting a replacement product.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "33",
+            {
+                "name": "preview_orders",
+                "attribute": {
+                    "value": "Your return or exchange process has been initiated. Here is your reference number: #123456. A confirmation email has been sent to you.",
+                    "task": "Confirm the initiation of the return or exchange process and provide a reference number or confirmation email as proof of the request.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "34",
+            {
+                "name": "find_user_id_by_email",
+                "attribute": {
+                    "value": "If you need further assistance or have additional questions, I can connect you with a human assistant.",
+                    "task": "Offer to connect the customer with a human assistant if they need further assistance or have additional questions.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "35",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Would you like to view the contents of your cart or proceed directly to checkout? By the way, Prime members enjoy additional benefits including exclusive discounts.",
+                    "task": "Ask the user if they want to view the contents of their cart or proceed directly to checkout, and mention the benefits of signing up for a Prime membership if applicable.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "36",
+            {
+                "name": "get_products",
+                "attribute": {
+                    "value": "Here are the details of the items in your cart: [Product Details]. Prime members can enjoy exclusive discounts on certain items.",
+                    "task": "If the user wants to view the cart, display the current items in the cart, including product details, quantities, and total cost, while highlighting any exclusive discounts available to Prime members.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "37",
+            {
+                "name": "search_products",
+                "attribute": {
+                    "value": "You can modify your cart by adding or removing items. Just let me know what changes you'd like to make. Remember, Prime members can save more on their purchases.",
+                    "task": "Allow the user to modify the cart by adding or removing items, or updating quantities. Confirm any changes made and remind them of additional savings with Prime membership.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "38",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Do you have any promo codes or discounts you would like to apply? Prime members can access exclusive discounts on many products.",
+                    "task": "Ask the user if they have any promo codes or discounts they would like to apply to the cart, and inform them about exclusive Prime discounts.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "39",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Would you like to proceed to checkout? I can confirm your shipping and billing information. Prime members enjoy a faster checkout process.",
+                    "task": "Provide the option to proceed to the checkout page and confirm the user's shipping and billing information, while suggesting the convenience of faster checkout with Prime.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "40",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "Do you have any specific delivery instructions or preferences? Prime members can benefit from flexible delivery options.",
+                    "task": "Ask the user if they have any specific delivery instructions or preferences, such as a preferred delivery time or contact method, and explain how Prime can provide flexible delivery options.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "41",
+            {
+                "name": "get_order",
+                "attribute": {
+                    "value": "Here's the final order summary: [Order Summary]. Please review all costs and applied discounts. Prime members receive exclusive benefits.",
+                    "task": "Review the final order summary with the user, including all costs and applied discounts, before confirming the purchase, and highlight any Prime-exclusive benefits in their order.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "42",
+            {
+                "name": "get_order",
+                "attribute": {
+                    "value": "Let's complete the payment process. We ensure secure and smooth transactions. Prime members enjoy simplified future transactions.",
+                    "task": "Assist the user in completing the payment process, ensuring secure and smooth transaction handling, and suggest how Prime can simplify future transactions.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "43",
+            {
+                "name": "preview_orders",
+                "attribute": {
+                    "value": "Your order has been placed successfully. Here is your order confirmation number: [Order Number]. You can track your order easily with Prime tracking perks.",
+                    "task": "Confirm the order placement and provide the user with an order confirmation number and details on how to track their order, mentioning any Prime tracking perks.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "44",
+            {
+                "name": "get_user_details",
+                "attribute": {
+                    "value": "If you have any additional questions, I'm here to help. You can also reach out to our support team. Prime members receive added customer support benefits.",
+                    "task": "Offer assistance with any additional questions or provide contact information for further support, and remind them of the added customer support benefits with Prime membership.",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ]
+    ],
+    "edges": [
+        [
+            "0",
+            "1",
+            {
+                "intent": "User wants information about available products",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "1",
+            "2",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "2",
+            "3",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "3",
+            "4",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "4",
+            "5",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "6",
+            {
+                "intent": "User wants recommendations for specific products",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "6",
+            "7",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "7",
+            "8",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "8",
+            "9",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "9",
+            "10",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "11",
+            {
+                "intent": "User wants to know about current promotions and deals",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "12",
+            {
+                "intent": "User wants to compare product specifications and prices",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "12",
+            "13",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "13",
+            "14",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "14",
+            "15",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "15",
+            "16",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "17",
+            {
+                "intent": "User wants information on shipping and delivery",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "18",
+            {
+                "intent": "User wants to contact customer support or the seller",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "18",
+            "19",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "19",
+            "20",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "20",
+            "21",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "21",
+            "22",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "23",
+            {
+                "intent": "User wants to write or read product reviews",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "23",
+            "24",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "24",
+            "25",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "25",
+            "26",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "26",
+            "27",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "28",
+            {
+                "intent": "User wants to return or exchange a product",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "28",
+            "29",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "29",
+            "30",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "30",
+            "31",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "31",
+            "32",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "32",
+            "33",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "33",
+            "34",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "35",
+            {
+                "intent": "User wants to manage their cart and checkout process",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "35",
+            "36",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "36",
+            "37",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "37",
+            "38",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "38",
+            "39",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "39",
+            "40",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "40",
+            "41",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "41",
+            "42",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "42",
+            "43",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "43",
+            "44",
+            {
+                "intent": "None",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ]
+    ],
+    "role": "shopping assistant",
+    "user_objective": "Be able to answer these type of questions.\n - What type of products do you provide? \n - Please give me a list of products I can buy from this platform?\n - The history about your store\n - What's your value proposition?\n - what's your current promotions/deals?\n - I want to buy hat for my children\n - Is there any hat under 10 dollars\n - I'm exploring the bed sheet options\n - If there is any new products coming out for my favorite blanket brand\n - what is the lowest price for throw blanket sold and delivered by your store?\n - When will this fleece blanket be available?\n - Compare bedding Set Solid Color Luxury and soft skin-friendly Flannel Duvet\n - How much is soft skin-friendly Flannel Duvet again? compare with this Solid Color Luxury?\n - Please pick the the top 5 most recent and worst review comment for this product\n - How can I contact the seller for this product?\n - What material is used for this pillow?\n - I want to view my cart.\n - Take me to the checkout page.\n - Are there any promotions available right now?\n - Do you receive my order request?\n - Where I can get the receipt, I need it for reimbursement.\n - What are the shipping options?\n - I want the delivery guy to give me a call before delivery\n - Take me to the order tracking page\n - Where is my package now?\n - When will my package arrived?\n - I bought light pink hat before, please buy it again\n - Oh, I want to change the address for my order\n - How can I write reviews?\n - Whether the sellers know exactly who wrote the review? Can it be anonymous?\n - The product sucks, I want to return!\n - Give me the human assistant!",
+    "builder_objective": "",
+    "domain": "Ecommerce",
+    "intro": "Awhale is an online retailer offering a curated selection of children's apparel and home accessories. Their product range includes kid's hats, aprons, bedding, pillows, throws, and comforters, all designed to combine functionality with appealing designs. Awhale emphasizes customer engagement by offering a 30% discount on first purchases for newsletter subscribers. For inquiries, customers can reach out via email at customer.service@awhaletrading.com. Awhale is active on social media platforms, including Facebook and Instagram, where they share exclusive offers and updates. Their website also features a blog that provides insights and tips related to their products, such as the versatility of their denim aprons. Awhale accepts various payment methods, including major credit cards and digital payment options like PayPal and Apple Pay, ensuring a secure and convenient shopping experience.",
+    "task_docs": [],
+    "rag_docs": [],
+    "tasks": [],
+    "workers": [],
+    "tools": [
+        "find_user_id_by_email",
+        "get_collection",
+        "get_order",
+        "get_products",
+        "get_user_details",
+        "preview_collections",
+        "preview_orders",
+        "search_collections",
+        "search_products"
+    ],
+    "nluapi": "http://localhost:55135/nlu/predict",
+    "slotfillapi": "http://localhost:55135/slotfill/predict"
+}

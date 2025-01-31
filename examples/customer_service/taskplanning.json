@@ -1,0 +1,89 @@
+[
+    {
+        "task_name": "Provide detailed information about specific robots and their functionalities",
+        "steps": [
+            "Provide detailed information about specific robots and their functionalities"
+        ]
+    },
+    {
+        "task_name": "Provide information on purchasing or renting options for robots, including pricing and availability",
+        "steps": [
+            "Initiate interaction by asking the user about their interest in purchasing or renting a robot.",
+            "Use RagMsgWorker to access the company's internal documentation to gather information about purchasing or renting options, including pricing and availability.",
+            "Deliver the retrieved information to the user using MessageWorker, ensuring clarity and addressing the user's specific inquiry.",
+            "Ask the user if they need additional information or have further questions regarding the robots.",
+            "Provide further assistance or clarify any additional inquiries using RAGWorker, if necessary, to ensure all user concerns are addressed."
+        ]
+    },
+    {
+        "task_name": "Provide assistance with checking order status and estimated delivery times",
+        "steps": [
+            "Inquire about the order details, such as the order number or email address associated with the order.",
+            "Use the RAGWorker to retrieve the order status and estimated delivery time based on the provided order details.",
+            "Provide the user with the current status and estimated delivery time of the order.",
+            "Ask if the user needs further assistance or has any other questions regarding their order."
+        ]
+    },
+    {
+        "task_name": "Provide technical support and troubleshooting guidance for operational issues with robots",
+        "steps": [
+            "Use RagMsgWorker to greet the user and ask them to describe the technical issue they are experiencing with the robot.",
+            "Utilize RAGWorker to analyze the user's input and search the company's internal documentation for relevant troubleshooting information.",
+            "Provide the user with specific troubleshooting steps or guidance based on the information retrieved by the RAGWorker.",
+            "Ask the user if the provided solution resolved their issue or if they need further assistance.",
+            "If the issue is not resolved, offer additional troubleshooting steps or escalate the issue to a human agent if necessary.",
+            "Once the issue is resolved, thank the user for their patience and offer assistance with any other inquiries they might have."
+        ]
+    },
+    {
+        "task_name": "Provide information on company headquarters, offices, and contact details for inquiries",
+        "steps": [
+            "Provide information on company headquarters, offices, and contact details for inquiries"
+        ]
+    },
+    {
+        "task_name": "Arrange for product demonstrations or consultations with sales representatives",
+        "steps": [
+            "Initiate conversation to understand the user's interest in specific products or services for which they would like a demonstration or consultation.",
+            "Use the RAGWorker to retrieve information from the company's internal documentation about available demonstrations or consultations related to the user's interest.",
+            "Present the available demonstration or consultation options to the user using the MessageWorker.",
+            "Ask the user to confirm their preferred demonstration or consultation option and gather any necessary details such as preferred dates and times.",
+            "Finalize the arrangement by confirming the details with the user and providing information about the scheduled demonstration or consultation."
+        ]
+    },
+    {
+        "task_name": "Provide information on customization options and integration capabilities of robots with existing systems",
+        "steps": [
+            "Inquire about the user's specific interest or requirements regarding robot customization and integration.",
+            "Utilize RAGWorker to retrieve information from internal documentation about customization options and integration capabilities.",
+            "Deliver the retrieved information to the user using the MessageWorker.",
+            "Ask if the user has any additional questions or requires further clarification on the provided information.",
+            "Offer guidance on next steps, such as contacting a specialist or accessing more detailed documentation if needed."
+        ]
+    },
+    {
+        "task_name": "Provide details on service packages, maintenance plans, and warranty information",
+        "steps": [
+            "Provide details on service packages, maintenance plans, and warranty information"
+        ]
+    },
+    {
+        "task_name": "Facilitate subscription to company newsletters and product updates",
+        "steps": [
+            "Inquire if the user is interested in subscribing to the company newsletters and product updates.",
+            "Provide information about the benefits of subscribing and any relevant details about the newsletters and updates.",
+            "Collect necessary information from the user, such as their email address and any preferences for types of updates.",
+            "Confirm the user's subscription and provide any additional information or next steps."
+        ]
+    },
+    {
+        "task_name": "Provide information on partnership or collaboration opportunities with Richtech Robotics",
+        "steps": [
+            "Greet the user and inquire about their specific interest in partnership or collaboration opportunities with Richtech Robotics.",
+            "Use the RAGWorker to retrieve detailed information from the company's internal documentations regarding partnership and collaboration opportunities.",
+            "Present the retrieved information to the user, highlighting key points such as types of partnerships available, requirements, and benefits.",
+            "Ask the user if they need further details on any specific aspect of the partnership opportunities or if they have any additional questions.",
+            "Provide guidance on the next steps for initiating a partnership or collaboration, such as filling out a contact form or reaching out to a specific department."
+        ]
+    }
+]

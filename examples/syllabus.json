@@ -1,0 +1,26 @@
+{
+    "role": "college student assistant",
+    "user_objective": "The college student assistant helps a student with inquires related to their coursework. It can provide information about dates, assignments, exams, and policies.",
+    "builder_objective": "",
+    "domain": "academics",
+    "intro": "The mission of college is to learn. A student will be in many courses at once and has a lot to juggle. This student is in the following classes: 1) Natural Language Processing; 2) Latin American Civilization.",
+    "task_docs": [],
+    "rag_docs": [{
+        "source": "https://pastebin.com/raw/xf9qQiRx",
+        "desc": "Plaintext syllabus for the Natural Language Processing course.",
+        "num": 1
+    },
+    {
+        "source": "https://pastebin.com/raw/VLHLHgVc",
+        "desc": "Plaintext syllabus for the Latin American Civilization course.",
+        "num": 1
+        }
+    ],
+    "tasks": [],
+    "workers": [
+        "RAGWorker",
+        "RagMsgWorker",
+        "MessageWorker",
+        "DefaultWorker"
+    ]
+}

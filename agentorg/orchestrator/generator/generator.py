@@ -8,6 +8,7 @@ import subprocess
 import pickle
 from pathlib import Path
 import inspect
+import importlib
 
 from langchain.prompts import PromptTemplate
 from langchain_openai.chat_models import ChatOpenAI
@@ -22,8 +23,6 @@ from textual.widgets.tree import TreeNode
 from agentorg.utils.utils import postprocess_json
 from agentorg.orchestrator.generator.prompts import *
 from agentorg.utils.loader import Loader
-from agentorg.workers.worker import WORKER_REGISTRY
-from agentorg.tools.tools import TOOL_REGISTRY
 
 
 logger = logging.getLogger(__name__)
@@ -172,11 +171,56 @@ class Generator:
         self.task_docs = self.product_kwargs.get("task_docs") 
         self.rag_docs = self.product_kwargs.get("rag_docs") 
         self.tasks = self.product_kwargs.get("tasks")
-        self.workers = self.product_kwargs.get("workers")
-        self.tools = self.product_kwargs.get("tools")
+        self.workers = self._init_workers(self.product_kwargs.get("workers"))
+        self.tools = self._init_tools(self.product_kwargs.get("tools"))
         self.model = model
         self.timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         self.output_dir = output_dir
+    
+    def _init_tools(self, tools):
+        # return dict of valid tools with name and description
+        tool_registry = {}
+        for tool in tools:
+            tool_id = tool["id"]
+            name = tool["name"]
+            path = tool["path"]
+            try: # try to import the tool to check its existance
+                filepath = os.path.join("agentorg.env.tools", path)
+                module_name = filepath.replace(os.sep, ".").rstrip(".py")
+                module = importlib.import_module(module_name)
+                func = getattr(module, name)
+            except Exception as e:
+                logger.error(f"Tool {name} is not registered, error: {e}")
+            tool_name = func().name
+            tool_desc = func().description
+            tool_registry[tool_id] = {
+                "name": tool_name,
+                "description": tool_desc
+            }
+        return tool_registry
+    
+    def _init_workers(self, workers):
+        worker_registry = {}
+        for worker in workers:
+            worker_id = worker["id"]
+            name = worker["name"]
+            path = worker["path"]
+            try: # try to import the worker to check its existance
+                filepath = os.path.join("agentorg.env.workers", path)
+                module_name = filepath.replace(os.sep, ".").rstrip(".py")
+                module = importlib.import_module(module_name)
+                func = getattr(module, name)
+            except Exception as e:
+                logger.error(f"Worker {name} is not registered, error: {e}")
+            worker_name = name
+            worker_desc = func().description
+            worker_registry[worker_id] = {
+                "name": worker_name,
+                "description": worker_desc,
+                "function": func
+            }
+        return worker_registry
+    
     
     def _generate_tasks(self):
         # based on the type and documents
@@ -200,23 +244,21 @@ class Generator:
     def _generate_best_practice(self, task):
         # Best practice detection
         resources = {}
-        for worker_name in self.workers:
-            worker = WORKER_REGISTRY.get(worker_name)
-            if not worker:
-                logger.error(f"Worker {worker_name} is not registered in the WORKER_REGISTRY")
-                continue
-            worker_desp = WORKER_REGISTRY.get(worker_name).description
+        for worker_id, worker_info in self.workers.items():
+            worker_name = worker_info["name"]
+            worker_desc = worker_info["description"]
+            worker_func = worker_info["function"]
             # Retrieve all methods of the class
             skeleton = {}
-            for name, method in inspect.getmembers(worker, predicate=inspect.isfunction):
+            for name, method in inspect.getmembers(worker_func, predicate=inspect.isfunction):
                 signature = inspect.signature(method)
                 skeleton[name] = str(signature)
-            worker_resource = worker_desp + "\n"
+            worker_resource = worker_desc + "\n"
             worker_resource += "The class skeleton of the worker is as follow: \n" + "\n".join([f"{name}{parameters}" for name, parameters in skeleton.items()]) + "\n\n"
             logger.debug(f"Code skeleton of the worker: {worker_resource}")
             
             resources[worker_name] = worker_resource
-        resources_str = "\n".join([f"{name}\n: {desp}" for name, desp in resources.items()])
+        resources_str = "\n".join([f"{name}\n: {desc}" for name, desc in resources.items()])
         prompt = PromptTemplate.from_template(check_best_practice_sys_prompt)
         input_prompt = prompt.invoke({"task": task["task"], "level": "1", "resources": resources_str})
         final_chain = self.model | StrOutputParser()
@@ -251,24 +293,31 @@ class Generator:
         # mapping resources to the best practice
         prompt = PromptTemplate.from_template(embed_resources_sys_prompt)
         resources = {}
-        for worker_name in self.workers:
-            if not WORKER_REGISTRY.get(worker_name):
-                logger.error(f"Worker {worker_name} is not registered in the WORKER_REGISTRY")
-                continue
-            worker_desp = WORKER_REGISTRY.get(worker_name).description
-            resources[worker_name] = worker_desp
+        resource_id_map = {}
+        for worker_id, worker_info in self.workers.items():
+            worker_name = worker_info["name"]
+            worker_desc = worker_info["description"]
+            resources[worker_name] = worker_desc
+            resource_id_map[worker_name] = worker_id
         
-        for tool_name in self.tools:
-            if not TOOL_REGISTRY.get(tool_name):
-                logger.error(f"Tool {tool_name} is not registered in the TOOL_REGISTRY")
-                continue
-            tool_desc = TOOL_REGISTRY.get(tool_name)().description
+        for tool_id, tool_info in self.tools.items():
+            tool_name = tool_info["name"]
+            tool_desc = tool_info["description"]
             resources[tool_name] = tool_desc
+            resource_id_map[tool_name] = tool_id
             
         input_prompt = prompt.invoke({"best_practice": best_practice, "resources": resources})
         final_chain = self.model | StrOutputParser()
         answer = final_chain.invoke(input_prompt)
-        return postprocess_json(answer)
+        json_answer = postprocess_json(answer)
+        # add resource id
+        for i in range(len(json_answer)):
+            ans = json_answer[i]
+            resource_id = resource_id_map.get(ans["resource"], None)
+            if not resource_id:
+                logger.info("Error while retrieving resource id")
+            json_answer[i]["resource_id"] = resource_id
+        return json_answer
     
     def _format_task_graph(self, finetuned_best_practices):
         node_id = 1
@@ -281,8 +330,10 @@ class Generator:
                 node = []
                 node.append(str(node_id))
                 node.append({
-                    "name": step['resource'],
-                    # "name": "DefaultWorker", # Use DefaultWorker to decide which worker to use for specific task
+                    "resource": {
+                        "id": step["resource_id"],
+                        "name": step['resource'],
+                    },
                     "attribute": {
                         "value": step['example_response'],
                         "task": step['task'],
@@ -330,8 +381,16 @@ class Generator:
         final_chain = self.model | StrOutputParser()
         answer = final_chain.invoke(input_prompt)
         start_msg = postprocess_json(answer)
+        message_worker_id = None
+        for worker_id, worker_info in self.workers.items():
+            if worker_info["name"] == "MessageWorker":
+                message_worker_id = worker_id
+                break
         start_node.append({
-            "name": "MessageWorker",
+            "resource": {
+                "id": message_worker_id,
+                "name": "MessageWorker",
+            },
             "attribute": {
                 "value": start_msg['message'],
                 "task": "start message",
@@ -380,6 +439,7 @@ class Generator:
 
 
     def generate(self):
+
         # Step 0: Load the docs
         self._load_docs()
         

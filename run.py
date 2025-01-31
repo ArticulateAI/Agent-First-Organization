@@ -14,13 +14,14 @@ import shopify
 
 from agentorg.utils.utils import init_logger
 from agentorg.orchestrator.orchestrator import AgentOrg
-from create import API_PORT
+# from create import API_PORT
 from agentorg.utils.model_config import MODEL
+from agentorg.env.env import Env
 
-
+API_PORT = "55135"
 load_dotenv()
-session = shopify.Session(os.environ["SHOPIFY_SHOP_URL"], os.environ["SHOPIFY_API_VERSION"], os.environ["SHOPIFY_ACCESS_TOKEN"])
-shopify.ShopifyResource.activate_session(session)
+# session = shopify.Session(os.environ["SHOPIFY_SHOP_URL"], os.environ["SHOPIFY_API_VERSION"], os.environ["SHOPIFY_ACCESS_TOKEN"])
+# shopify.ShopifyResource.activate_session(session)
 
 process = None  # Global reference for the FastAPI subprocess
 
@@ -46,9 +47,9 @@ signal.signal(signal.SIGINT, lambda signum, frame: exit(0))
 signal.signal(signal.SIGTERM, lambda signum, frame: exit(0))
 
 
-def get_api_bot_response(args, history, user_text, parameters):
+def get_api_bot_response(args, history, user_text, parameters, env):
     data = {"text": user_text, 'chat_history': history, 'parameters': parameters}
-    orchestrator = AgentOrg(config=os.path.join(args.input_dir, "taskgraph.json"))
+    orchestrator = AgentOrg(config=os.path.join(args.input_dir, "taskgraph.json"), env=env)
     result = orchestrator.get_response(data)
 
     return result['answer'], result['parameters']
@@ -90,10 +91,17 @@ if __name__ == "__main__":
 
     # Initialize NLU and Slotfill APIs
     start_apis()
+
+    # Initialize env
+    config = json.load(open(os.path.join(args.input_dir, "taskgraph.json")))
+    env = Env(
+        tools = config.get("tools", []),
+        workers = config.get("workers", []),
+        slotsfillapi = config["slotfillapi"]
+    )
         
     history = []
     params = {}
-    config = json.load(open(os.path.join(args.input_dir, "taskgraph.json")))
     user_prefix = "user"
     worker_prefix = "assistant"
     for node in config['nodes']:
@@ -108,7 +116,8 @@ if __name__ == "__main__":
             if user_text.lower() == "quit":
                 break
             start_time = time.time()
-            output, params = get_api_bot_response(args, history, user_text, params)
+            output, params = get_api_bot_response(args, history, user_text, params, env)
+            print(params["history"])
             history.append({"role": user_prefix, "content": user_text})
             history.append({"role": worker_prefix, "content": output})
             print(f"getAPIBotResponse Time: {time.time() - start_time}")

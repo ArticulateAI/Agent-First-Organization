@@ -1,0 +1,36 @@
+[
+    {
+        "task_name": "Provide course schedule information",
+        "steps": [
+            "Provide course schedule information"
+        ]
+    },
+    {
+        "task_name": "Provide assignment deadline information",
+        "steps": [
+            "Provide assignment deadline information"
+        ]
+    },
+    {
+        "task_name": "Provide exam schedule information",
+        "steps": [
+            "Provide exam schedule information"
+        ]
+    },
+    {
+        "task_name": "Provide course policy information",
+        "steps": [
+            "Provide course policy information"
+        ]
+    },
+    {
+        "task_name": "Provide reminders and updates for coursework",
+        "steps": [
+            "Identify the user's current courses and any upcoming deadlines or important dates using the RAGWorker to access internal documentation and gather relevant details.",
+            "Provide the user with a summary of upcoming coursework deadlines and any important updates or changes to their schedule using the MessageWorker to deliver this information.",
+            "Ask the user if they need reminders for specific assignments or exams and how they would like to receive these reminders (e.g., daily, weekly, specific time).",
+            "Set up personalized reminders based on the user's preferences and confirm with the user that the reminders have been scheduled.",
+            "Offer additional assistance, such as answering questions about specific assignments or providing study resources, to support the user in managing their coursework."
+        ]
+    }
+]

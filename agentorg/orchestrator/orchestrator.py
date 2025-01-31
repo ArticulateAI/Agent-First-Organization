@@ -7,6 +7,8 @@ import os
 from typing import List, Dict, Any, Tuple
 import ast
 import copy
+from agentorg.env.env import Env
+import janus
 from dotenv import load_dotenv
 
 from langchain_core.runnables import RunnableLambda
@@ -15,16 +17,13 @@ from openai import OpenAI
 from litellm import completion
 
 from agentorg.orchestrator.task_graph import TaskGraph
-from agentorg.workers.worker import WORKER_REGISTRY
-from agentorg.tools.tools import Tool, TOOL_REGISTRY
-from agentorg.tools.RAG.utils import ToolGenerator
+from agentorg.env.tools.utils import ToolGenerator
 from agentorg.orchestrator.NLU.nlu import SlotFilling
-from agentorg.orchestrator.planner.function_calling import FunctionCallingPlanner
 from agentorg.orchestrator.prompts import RESPOND_ACTION_NAME, RESPOND_ACTION_FIELD_NAME, REACT_INSTRUCTION
-from agentorg.utils.graph_state import ConvoMessage, OrchestratorMessage
+from agentorg.types import EventType, StreamType
+from agentorg.utils.graph_state import ConvoMessage, OrchestratorMessage, MessageState, StatusEnum, BotConfig
 from agentorg.utils.utils import init_logger, format_chat_history
 from agentorg.orchestrator.NLU.nlu import NLU
-from agentorg.utils.graph_state import MessageState, StatusEnum
 from agentorg.utils.trace import TraceRunName
 from agentorg.utils.model_config import MODEL
 
@@ -34,49 +33,17 @@ logger = logging.getLogger(__name__)
 
 
 class AgentOrg:
-    def __init__(self, config, **kwargs):
-        self.product_kwargs = json.load(open(config))
-        # os.environ["AVAILABLE_WORKERS"] = ",".join(self.product_kwargs["workers"])
+    def __init__(self, config, env: Env, **kwargs):
+        if isinstance(config, dict):
+            self.product_kwargs = config
+        else:
+            self.product_kwargs = json.load(open(config))
         self.user_prefix = "user"
         self.worker_prefix = "assistant"
         self.environment_prefix = "tool"
         self.__eos_token = "\n"
-        self.workers = list(WORKER_REGISTRY.keys())
-        self.tools = list(TOOL_REGISTRY.keys())
         self.task_graph = TaskGraph("taskgraph", self.product_kwargs)
-        self.planner = FunctionCallingPlanner(
-            tools_map=TOOL_REGISTRY
-        )
-        self.slotfillapi = SlotFilling(self.product_kwargs.get("slotfillapi"))
-    
-    def step(self, name, message_state, params):
-        if name in TOOL_REGISTRY:
-            logger.info(f"{name} tool selected")
-            tool: Tool = TOOL_REGISTRY[name]()
-            tool.init_slotfilling(self.task_graph.slotfillapi)
-            response_state = tool.execute(message_state)
-            params["history"] = response_state.get("trajectory", [])
-            current_node = params.get("curr_node")
-            params["node_status"][current_node] = response_state.get("status", StatusEnum.COMPLETE)
-                
-        elif name in WORKER_REGISTRY:
-            logger.info(f"{name} worker selected")
-            worker = WORKER_REGISTRY[name]()
-            response_state = worker.execute(message_state)
-            call_id = str(uuid.uuid4())
-            params["history"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': "", 'name': name}, 'id': call_id, 'type': 'function'}], 'function_call': None})
-            params["history"].append({
-                        "role": "tool",
-                        "tool_call_id": call_id,
-                        "name": name,
-                        "content": response_state["response"]
-            })
-        else:
-            logger.info("planner selected")
-            action, response_state, msg_history = self.planner.execute(message_state, params["history"])
-        
-        logger.info(f"Response state from {name}: {response_state}")
-        return response_state, params
+        self.env = env
 
     def generate_next_step(
         self, messages: List[Dict[str, Any]]
@@ -103,7 +70,7 @@ class AgentOrg:
         return message.model_dump(), action, res._hidden_params["response_cost"]
 
 
-    def get_response(self, inputs: dict) -> Dict[str, Any]:
+    def get_response(self, inputs: dict, stream_type: StreamType = None, message_queue: janus.SyncQueue = None) -> Dict[str, Any]:
         text = inputs["text"]
         chat_history = inputs["chat_history"]
         params = inputs["parameters"]
@@ -112,10 +79,11 @@ class AgentOrg:
         chat_history_str = format_chat_history(chat_history)
         params["dialog_states"] = params.get("dialog_states", [])
         metadata = params.get("metadata", {})
-        metadata["conv_id"] = metadata.get("conv_id", str(uuid.uuid4()))
+        metadata["chat_id"] = metadata.get("chat_id", str(uuid.uuid4()))
         metadata["turn_id"] = metadata.get("turn_id", 0) + 1
+        metadata["tool_response"] = {}
         params["metadata"] = metadata
-        params["history"] = params.get("history", "")
+        params["history"] = params.get("history", [])
         if not params["history"]:
             params["history"] = copy.deepcopy(chat_history)
         else:
@@ -164,45 +132,74 @@ class AgentOrg:
                     "curr_global_intent": params.get("curr_pred_intent"),
                     "dialog_states": params.get("dialog_states"),
                     "node_status": params.get("node_status")}, 
-                metadata={"conv_id": metadata.get("conv_id"), "turn_id": metadata.get("turn_id")}
+                metadata={"chat_id": metadata.get("chat_id"), "turn_id": metadata.get("turn_id")}
             )
+
+        # Direct response
+        node_attribute = node_info["attribute"]
+        if node_attribute["value"].strip():
+            if node_attribute.get("direct_response"):                    
+                return_response = {
+                    "answer": node_attribute["value"],
+                    "parameters": params
+                }
+                if node_attribute["type"] == "multiple-choice":
+                    return_response["choice_list"] = node_attribute["choice_list"]
+                return return_response
 
         # Tool/Worker
         user_message = ConvoMessage(history=chat_history_str, message=text)
         orchestrator_message = OrchestratorMessage(message=node_info["attribute"]["value"], attribute=node_info["attribute"])
-        sys_instruct = "You are a " + self.product_kwargs["role"] + ". " + self.product_kwargs["user_objective"] + self.product_kwargs["builder_objective"] + self.product_kwargs["intro"]
+        sys_instruct = "You are a " + self.product_kwargs["role"] + ". " + self.product_kwargs["user_objective"] + self.product_kwargs["builder_objective"] + self.product_kwargs["intro"] + self.product_kwargs.get("opt_instruct", "")
+        logger.info("=============sys_instruct=============")
+        logger.info(sys_instruct)
+        bot_config = BotConfig(
+            bot_id=self.product_kwargs.get("bot_id", "default"),
+            version=self.product_kwargs.get("version", "default"),
+            language=self.product_kwargs.get("language", "EN"),
+            bot_type=self.product_kwargs.get("bot_type", "presalebot"),
+            available_workers=self.product_kwargs.get("workers", [])
+        )
         message_state = MessageState(
             sys_instruct=sys_instruct, 
+            bot_config=bot_config,
             user_message=user_message, 
             orchestrator_message=orchestrator_message, 
             trajectory=params["history"], 
             message_flow=params.get("worker_response", {}).get("message_flow", ""), 
             slots=params.get("dialog_states"),
-            metadata=params.get("metadata")
+            metadata=params.get("metadata"),
+            is_stream=True if stream_type is not None else False,
+            message_queue=message_queue
         )
         
-        response_state, params = self.step(node_info["name"], message_state, params)
+        response_state, params = self.env.step(node_info["id"], message_state, params)
         
         logger.info(f"{response_state=}")
+
+        tool_response = params.get("metadata", {}).get("tool_response", {})
+        params["metadata"]["tool_response"] = {}
 
         with ls.trace(name=TraceRunName.ExecutionResult, inputs={"message_state": message_state}) as rt:
             rt.end(
                 outputs={"metadata": params.get("metadata"), **response_state}, 
-                metadata={"conv_id": metadata.get("conv_id"), "turn_id": metadata.get("turn_id")}
+                metadata={"chat_id": metadata.get("chat_id"), "turn_id": metadata.get("turn_id")}
             )
 
         # ReAct framework to decide whether return to user or continue
         FINISH = False
         while not FINISH:
+            # if the last response is from the assistant with content(which means not from tool or worker but from function calling response), 
+            # then directly return the response otherwise it will continue to the next node but treat the previous response has been return to user.
+            if response_state.get("trajectory", []) \
+                and response_state["trajectory"][-1]["role"] == "assistant" \
+                and response_state["trajectory"][-1]["content"]: 
+                response_state["response"] = response_state["trajectory"][-1]["content"]
+                break
             node_info, params = taskgraph_chain.invoke(taskgraph_inputs)
             logger.info("=============node_info=============")
             logger.info(f"The while node info is : {node_info}")
-            if node_info["name"] not in WORKER_REGISTRY and node_info["name"] not in TOOL_REGISTRY:
-                planner = FunctionCallingPlanner(TOOL_REGISTRY)
-                chat_history_str = format_chat_history(chat_history)
-                user_message = ConvoMessage(history=chat_history_str, message=text)
-                orchestrator_message = OrchestratorMessage(message=node_info["attribute"]["value"], attribute=node_info["attribute"])
-                sys_instruct = "You are a " + self.product_kwargs["role"] + ". " + self.product_kwargs["user_objective"] + self.product_kwargs["builder_objective"] + self.product_kwargs["intro"]
+            if node_info["id"] not in self.env.workers and node_info["id"] not in self.env.tools:
                 message_state = MessageState(
                     sys_instruct=sys_instruct, 
                     user_message=user_message, 
@@ -210,18 +207,22 @@ class AgentOrg:
                     trajectory=params["history"], 
                     message_flow=params.get("worker_response", {}).get("message_flow", ""), 
                     slots=params.get("dialog_states"),
-                    metadata=params.get("metadata")
+                    metadata=params.get("metadata"),
+                    is_stream=True if stream_type is not None else False,
+                    message_queue=message_queue
                 )
                 
-                action, response_state, msg_history = planner.execute(message_state, params["history"])
+                action, response_state, msg_history = self.env.planner.execute(message_state, params["history"])
                 params["history"] = msg_history
                 if action == RESPOND_ACTION_NAME:
                     FINISH = True
+                else:
+                    tool_response = {}
             else:
-                if node_info["name"] in TOOL_REGISTRY:
-                    node_actions = [{"name": node_info["name"], "arguments": TOOL_REGISTRY[node_info["name"]]().info}]
-                elif node_info["name"] in WORKER_REGISTRY:
-                    node_actions = [{"name": node_info["name"], "description": WORKER_REGISTRY[node_info["name"]]().description}]
+                if node_info["id"] in self.env.tools:
+                    node_actions = [{"name": self.env.id2name[node_info["id"]], "arguments": self.env.tools[node_info["id"]]["execute"]().info}]
+                elif node_info["id"] in self.env.workers:
+                    node_actions = [{"name": self.env.id2name[node_info["id"]], "description": self.env.workers[node_info["id"]]["execute"]().description}]
                 action_spaces = node_actions
                 action_spaces.append({"name": RESPOND_ACTION_NAME, "arguments": {RESPOND_ACTION_FIELD_NAME: response_state.get("message_flow", "") or response_state.get("response", "")}})
                 logger.info("Action spaces: " + json.dumps(action_spaces))
@@ -239,12 +240,22 @@ class AgentOrg:
                     FINISH = True
                 else:
                     message_state["response"] = "" # clear the response cache generated from the previous steps in the same turn
-                    response_state, params = self.step(action, message_state, params)
+                    response_state, params = self.env.step(self.env.name2id[action], message_state, params)
+                    tool_response = params.get("metadata", {}).get("tool_response", {})
 
         if not response_state.get("response", ""):
-            response_state = ToolGenerator.context_generate(response_state)
+            logger.info("No response from the ReAct framework, do context generation")
+            tool_response = {}
+            if stream_type is None:
+                response_state = ToolGenerator.context_generate(response_state)
+            else:
+                response_state = ToolGenerator.stream_context_generate(response_state)
 
         response = response_state.get("response", "")
+        params["metadata"]["tool_response"] = {}
+        # TODO: params["metadata"]["worker"] is not serialization, make it empty for now
+        params["metadata"]["worker"] = {}
+        params["tool_response"] = tool_response
         output = {
             "answer": response,
             "parameters": params
@@ -253,7 +264,7 @@ class AgentOrg:
         with ls.trace(name=TraceRunName.OrchestResponse) as rt:
             rt.end(
                 outputs={"metadata": params.get("metadata"), **output},
-                metadata={"conv_id": metadata.get("conv_id"), "turn_id": metadata.get("turn_id")}
+                metadata={"chat_id": metadata.get("chat_id"), "turn_id": metadata.get("turn_id")}
             )
 
         return output

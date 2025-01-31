@@ -1,6 +1,16 @@
 from typing import TypedDict, Annotated
+import janus
 from pydantic import BaseModel
 from enum import Enum
+
+
+### Bot-related classes
+class BotConfig(BaseModel):
+    bot_id: str
+    version: str
+    language: str
+    bot_type: str
+    available_workers: list[dict[str, str]]
 
 
 ### Message-related classes
@@ -45,6 +55,8 @@ class StatusEnum(Enum):
 class MessageState(TypedDict):
     # system configuration
     sys_instruct: str
+    # bot configuration
+    bot_config: BotConfig
     # input message
     user_message: ConvoMessage
     orchestrator_message: OrchestratorMessage
@@ -58,3 +70,6 @@ class MessageState(TypedDict):
     status: StatusEnum
     slots: list[Slot]  # probably won't need anymore
     metadata: dict[str, any]
+    # stream
+    is_stream: bool
+    message_queue: janus.SyncQueue
