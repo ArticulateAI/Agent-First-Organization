@@ -156,6 +156,13 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
     }),
+
+    scripts: [
+      {
+        src: '/js/rb2b-tracking.js',
+        async: false,
+      },
+    ],
 };
 
 export default config;
