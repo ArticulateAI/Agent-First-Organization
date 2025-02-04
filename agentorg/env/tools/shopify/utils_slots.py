@@ -1,6 +1,3 @@
-
-from agentorg.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
-
 class ShopifySlots:
     def to_list(baseSlot: dict):
         slot = baseSlot.copy()

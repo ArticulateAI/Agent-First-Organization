@@ -1,7 +1,7 @@
 PAGEINFO_SLOTS = [
     {
         "name": "limit",
-        "type": "int",\
+        "type": "string",
         "description": "Maximum number of entries to show.",
         "prompt": "",
         "required": False
@@ -35,8 +35,8 @@ NO_NEXT_PAGE = "error: no more pages after"
 NO_PREV_PAGE = "error: no more pages before"
     
 def cursorify(kwargs):
-    limit = kwargs.get('limit', 10)
-    navigate = kwargs.get('navigate', 'stay')
+    limit = int(kwargs.get('limit')) if kwargs.get('limit') else 10
+    navigate = kwargs.get('navigate') if kwargs.get('navigate') else 'stay'
     pageInfo = kwargs.get('pageInfo')
     
     nav_param = f'first: {limit}'

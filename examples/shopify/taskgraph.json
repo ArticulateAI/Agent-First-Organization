@@ -21,56 +21,11 @@
             {   
                 "resource": {
                     "id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b",
-                    "name": "find_user_id_by_email"
+                    "name": "search_collections"
                 },
                 "attribute": {
                     "value": "",
-                    "task": "Find user id by email",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
-            "2",
-            {
-                "resource": {
-                    "id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443",
-                    "name": "get_user_details"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Find order id by user id",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
-            "3",
-            {
-                "resource": {
-                    "id": "2a2750cb-6226-4068-ba05-a4db83da3e16",
-                    "name": "get_order_details"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Get the product id for each order",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
-            "5",
-            {
-                "resource": {
-                    "id": "40f05456-525c-4d9d-ac37-54482d6b220b",
-                    "name": "FaissRAGWorker"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Answer user's question about product",
+                    "task": "Get related products based on user's inquiry",
                     "directed": false
                 },
                 "limit": 1
@@ -82,46 +37,7 @@
             "0",
             "1",
             {
-                "intent": "User want to know their order's information",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
-            }
-        ],
-        [
-            "1",
-            "2",
-            {
-                "intent": "None",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
-            }
-        ],
-        [
-            "2",
-            "3",
-            {
-                "intent": "None",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
-            }
-        ],
-        [
-            "0",
-            "5",
-            {
-                "intent": "User's inquire about product",
+                "intent": "User want to get some recommendations",
                 "attribute": {
                     "weight": 1,
                     "pred": true,
@@ -142,14 +58,12 @@
     ],
     "tasks": [],
     "tools": [
-        {"id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b", "name": "find_user_id_by_email", "path": "shopify/find_user_id_by_email.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
-        {"id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443", "name": "get_user_details", "path": "shopify/get_user_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
-        {"id": "2a2750cb-6226-4068-ba05-a4db83da3e16", "name": "get_order_details", "path": "shopify/get_order_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}}
+        {"id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b", "name": "search_collections", "path": "shopify/search_collections.py", "fixed_args": {"token": <access_token>, "shop_url": <url>, "api_version": <version>}}
     ],
     "workers": [
         {"id": "26bb6634-3bee-417d-ad75-23269ac17bc3", "name": "MessageWorker","path": "message_worker.py"},
         {"id": "40f05456-525c-4d9d-ac37-54482d6b220b", "name": "FaissRAGWorker", "path": "faiss_rag_worker.py"}
     ],
-    "nluapi": "http://localhost:55135/nlu",
-    "slotfillapi": "http://localhost:55135/slotfill"
+    "nluapi": "",
+    "slotfillapi": ""
 }
