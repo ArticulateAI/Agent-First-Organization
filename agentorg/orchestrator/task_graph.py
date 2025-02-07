@@ -80,13 +80,18 @@ class TaskGraph(TaskGraphBase):
 
     def jump_to_node(self, pred_intent, intent_idx, available_nodes, curr_node):
         logger.info(f"pred_intent in jump_to_node is {pred_intent}")
-        candidates_nodes = [self.intents[pred_intent][intent_idx]]
-        candidates_nodes = [node for node in candidates_nodes if available_nodes[node["target_node"]]["limit"] >= 1]
-        candidates_nodes_weights = [node["attribute"]["weight"] for node in candidates_nodes]
-        if candidates_nodes:
-            next_node = np.random.choice([node["target_node"] for node in candidates_nodes], p=normalize(candidates_nodes_weights))
-            next_intent = pred_intent
-        else:  # This is for protection, logically shouldn't enter this branch
+        try:
+            candidates_nodes = [self.intents[pred_intent][intent_idx]]
+            candidates_nodes = [node for node in candidates_nodes if available_nodes[node["target_node"]]["limit"] >= 1]
+            candidates_nodes_weights = [node["attribute"]["weight"] for node in candidates_nodes]
+            if candidates_nodes:
+                next_node = np.random.choice([node["target_node"] for node in candidates_nodes], p=normalize(candidates_nodes_weights))
+                next_intent = pred_intent
+            else:  # This is for protection, logically shouldn't enter this branch
+                next_node = curr_node
+                next_intent = list(self.graph.in_edges(curr_node, data="intent"))[0][2]
+        except Exception as e:
+            logger.error(f"Error in jump_to_node: {e}")
             next_node = curr_node
             next_intent = list(self.graph.in_edges(curr_node, data="intent"))[0][2]
         return next_node, next_intent
@@ -391,7 +396,7 @@ class TaskGraph(TaskGraphBase):
                 # check other intent (including unsure), if found, current flow end, add flow onto stack; if still unsure, then stay at the curr_node, and response without interactive.
                 other_intents = collections.defaultdict(list)
                 for key, value in available_intents.items():
-                    if key not in candidates_intents and key != "none":
+                    if key not in candidates_intents and key in self.intents and key != "none": # the intersection of available and global intents
                         other_intents[key] = value
 
                 if self.unsure_intent.get("intent") in other_intents.keys():
@@ -400,13 +405,14 @@ class TaskGraph(TaskGraphBase):
                     other_intents_w_unsure = copy.deepcopy(other_intents)
                     other_intents_w_unsure[self.unsure_intent.get("intent")].append(self.unsure_intent)
 
-                logger.info(f"Check other intent (including unsure): {other_intents_w_unsure}")
+                logger.info(f"Check other intent: {other_intents}")
                 
                 pred_intent = self.nluapi.execute(self.text, other_intents_w_unsure, self.chat_history_str, params.get("metadata", {}))
                 nlu_records.append({"candidate_intents": other_intents, 
                                     "pred_intent": pred_intent, "no_intent": False, "global_intent": True})
                 params["nlu_records"] = nlu_records
                 found_pred_in_avil, pred_intent, intent_idx = self._postprocess_intent(pred_intent, other_intents)
+                logger.info(f"found_pred_in_avil for global intent: {found_pred_in_avil}, pred_intent: {pred_intent}")
                 if found_pred_in_avil:  # found global intent
                     if pred_intent.lower() != self.unsure_intent.get("intent"):  # global intent is not unsure
                         logger.info(f"Global intent changed from {curr_pred_intent} to {pred_intent}")
