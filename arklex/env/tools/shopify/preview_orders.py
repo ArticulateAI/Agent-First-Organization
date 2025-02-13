@@ -1,90 +1,80 @@
-import json
 from typing import Any, Dict
 
-import shopify
-
 from arklex.env.tools.tools import register_tool
-from arklex.env.tools.shopify.utils import SHOPIFY_AUTH_ERROR
 
-description = "Get the status and details of an order."
+# general GraphQL navigation utilities
+from arklex.env.tools.shopify.utils_nav import *
+
+# Customer API
+from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
+from arklex.env.tools.shopify.utils import *
+from arklex.env.tools.shopify.auth_utils import *
+
+description = "Give a preview of customer's recent orders."
 slots = [
-    {
-        "name": "order_ids",
-        "type": "array",
-        "items": {"type": "string"},
-        "description": "The order id, such as gid://shopify/Order/1289503851427. If there is only 1 order, return in list with single item. If there are multiple order ids, please return all of them in a list.",
-        "prompt": "Please provide the order id to get the details of the order.",
-        "required": True,
-    },
-    {
-        "name": "limit",
-        "type": "int",
-        "description": "Maximum number of products to show.",
-        "prompt": "",
-        "required": False
-    }
+    ShopifySlots.REFRESH_TOKEN,
+    *PAGEINFO_SLOTS
 ]
 outputs = [
-    {
-        "name": "order_details",
-        "type": "dict",
-        "description": "The order details of the order. such as '{\"id\": \"gid://shopify/Order/1289503851427\", \"name\": \"#1001\", \"totalPriceSet\": {\"presentmentMoney\": {\"amount\": \"10.00\"}}, \"lineItems\": {\"nodes\": [{\"id\": \"gid://shopify/LineItem/1289503851427\", \"title\": \"Product 1\", \"quantity\": 1, \"variant\": {\"id\": \"gid://shopify/ProductVariant/1289503851427\", \"product\": {\"id\": \"gid:////shopify/Product/1289503851427\"}}}]}}'.",
-    }
+    ShopifyOutputs.ORDERS_DETAILS,
+    *PAGEINFO_OUTPUTS
 ]
-ORDERS_NOT_FOUND = "error: order not found"
-errors = [
-    SHOPIFY_AUTH_ERROR,
-    ORDERS_NOT_FOUND
-]
+
+USER_NOT_FOUND_ERROR = "error: user not found"
+errors = [USER_NOT_FOUND_ERROR]
+
 
 @register_tool(description, slots, outputs, lambda x: x not in errors)
-def preview_orders(order_ids: list, limit=10, **kwargs) -> str:
-    limit = limit or 10
-    
-    shop_url = kwargs.get("shop_url")
-    api_version = kwargs.get("api_version")
-    token = kwargs.get("token")
-
-    if not shop_url or not api_version or not token:
-        return SHOPIFY_AUTH_ERROR
+def preview_orders(refresh_token: str, **kwargs) -> str:
+    nav = cursorify(kwargs)
+    if not nav[1]: 
+        return nav[0]
     
     try:
-        ids = ' OR '.join(f'id:{oid.split("/")[-1]}' for oid in order_ids)
-        with shopify.Session.temp(shop_url, api_version, token):
-            response = shopify.GraphQL().execute(f"""
-                {{
-                    orders (query:"{ids}" first: {len(order_ids)}) {{
+        body = f'''
+            query {{ 
+                customer {{ 
+                    orders ({nav[0]}) {{
                         nodes {{
                             id
                             name
-                            totalPriceSet {{
-                                presentmentMoney {{
-                                    amount
-                                }}
+                            updatedAt
+                            statusPageUrl
+                            totalPrice {{
+                                amount
                             }}
-                            lineItems(first: {limit}) {{
+                            lineItems (first: 5) {{
                                 nodes {{
-                                    id
-                                    title
+                                    name
                                     quantity
-                                    variant {{
-                                        id
-                                        title
-                                        quantity
-                                        variant {{
-                                            id
-                                            product {{
-                                                id
-                                            }}
-                                        }}
+                                    totalPrice {{
+                                        amount
                                     }}
                                 }}
                             }}
                         }}
+                        pageInfo {{
+                            endCursor
+                            hasNextPage
+                            hasPreviousPage
+                            startCursor
+                        }}
                     }}
                 }}
-            """)
-        results = json.loads(response)["data"]["orders"]['nodes']
-        return results
-    except Exception as e:
-        return ORDERS_NOT_FOUND
+            }}
+        '''
+        try:
+            auth = {'Authorization': get_access_token(refresh_token)}
+        except:
+            return AUTH_ERROR, None
+        
+        try:
+            response = make_query(customer_url, body, {}, customer_headers | auth)['data']['customer']['orders']
+        except Exception as e:
+            return f"error: {e}"
+        
+        pageInfo = response['pageInfo']
+        return response['nodes'], pageInfo
+        
+    except Exception:
+        raise PermissionError 

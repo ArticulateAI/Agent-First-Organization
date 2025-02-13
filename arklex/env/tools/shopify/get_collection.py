@@ -3,75 +3,56 @@ from typing import Any, Dict
 
 import shopify
 
-from arklex.env.tools.tools import register_tool
-from arklex.env.tools.shopify.utils import SHOPIFY_AUTH_ERROR
+# general GraphQL navigation utilities
+from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
+from arklex.env.tools.shopify.utils_nav import *
 
-description = "Get the details of collection with a preview of the inventory from a list of collections."
+from arklex.env.tools.tools import register_tool
+
+description = "Get the details of the collection."
 slots = [
-    {
-        "name": "collection_ids",
-        "type": "array",
-        "items": {"type": "string"},
-        "description": "The collection id, such as 'gid://shopify/Collection/2938501948327'. If there is only 1 collection, return in list with single item. If there are multiple collection ids, please return all of them in a list.",
-        "prompt": "In order to proceed, please provide the collection id.",
-        "required": True,
-    },
-    {
-        "name": "limit",
-        "type": "int",
-        "description": "Maximum number of products to show.",
-        "prompt": "",
-        "required": False
-    }
+    ShopifySlots.COLLECTION_ID,
+    *PAGEINFO_SLOTS
 ]
 outputs = [
-    {
-        "name": "collection_details",
-        "type": "dict",
-        "description": "The collection details of the collection. such as \"['{'title': 'Beddings and Pillows', 'description': '', 'productsCount': {'count': 6}, 'products': {'nodes': [{'id': 'gid://shopify/Product/7296582090865'}, {'id': 'gid://shopify/Product/7296582025329'}, {'id': 'gid://shopify/Product/7296581894257'}, {'id': 'gid://shopify/Product/7296581763185'}, {'id': 'gid://shopify/Product/7296581337201'}], 'pageInfo': {'hasNextPage': true}}}', '{'title': 'Bedding', 'description': '', 'productsCount': {'count': 4}, 'products': {'nodes': [{'id': 'gid://shopify/Product/7296582123633'}, {'id': 'gid://shopify/Product/7296582090865'}, {'id': 'gid://shopify/Product/7296581894257'}, {'id': 'gid://shopify/Product/7296581763185'}], 'pageInfo': {'hasNextPage': false}}}']\""
-    }
+    ShopifyOutputs.COLLECTIONS_DETAILS,
+    *PAGEINFO_OUTPUTS
 ]
 COLLECTION_NOT_FOUND = "error: collection not found"
-errors = [
-    SHOPIFY_AUTH_ERROR,
-    COLLECTION_NOT_FOUND
-]
+errors = [COLLECTION_NOT_FOUND]
 
 @register_tool(description, slots, outputs, lambda x: x not in errors)
-def get_collection(collection_ids: list, limit=3, **kwargs) -> str:
-    limit = limit or 3
-    shop_url = kwargs.get("shop_url")
-    api_version = kwargs.get("api_version")
-    token = kwargs.get("token")
-    
-    if not shop_url or not api_version or not token:
-        return SHOPIFY_AUTH_ERROR
+def get_collection(collection_id: list, **kwargs) -> str:
+    nav = cursorify(kwargs)
+    if not nav[1]:
+        return nav[0]
     
     try:
-        results = []
-        with shopify.Session.temp(shop_url, api_version, token):
-            for collection_id in collection_ids:
-                response = shopify.GraphQL().execute(f"""
-                {{
-                    collection (id: "{collection_id}") {{
-                        title
-                        description
-                        productsCount {{
-                            count
-                        }}
-                        products (first: {limit}) {{
-                            nodes {{
-                                id
-                            }}
-                            pageInfo {{
-                                hasNextPage
-                            }}
-                        }}
+        response = shopify.GraphQL().execute(f"""
+        {{
+            collection (id: "{collection_id}") {{
+                title
+                description
+                productsCount {{
+                    count
+                }}
+                products ({nav[0]}) {{
+                    nodes {{
+                        id
+                    }}
+                    pageInfo {{
+                        endCursor
+                        hasNextPage
+                        hasPreviousPage
+                        startCursor
                     }}
                 }}
-                """)
-            parsed_response = json.loads(response)["data"]["collection"]
-            results.append(json.dumps(parsed_response))
-        return results
+            }}
+        }}
+        """)
+        results = json.loads(response)["data"]["collection"]
+        pageInfo = results['products']['pageInfo']
+        
+        return results, pageInfo
     except Exception as e:
         return COLLECTION_NOT_FOUND
