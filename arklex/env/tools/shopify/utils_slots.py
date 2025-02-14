@@ -4,7 +4,7 @@ class ShopifySlots:
         slot["name"] += 's'
         slot["items"] = {"type": baseSlot["type"]}
         slot["type"] = "array"
-        slot["description"] = f"List of {slot["name"]}. {slot['description']}"
+        slot["description"] = f"List of {slot['name']}. {slot['description']}"
         return slot
     
     USER_ID = {
