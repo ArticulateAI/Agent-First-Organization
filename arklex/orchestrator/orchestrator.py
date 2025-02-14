@@ -21,7 +21,7 @@ from arklex.env.tools.utils import ToolGenerator
 from arklex.orchestrator.NLU.nlu import SlotFilling
 from arklex.orchestrator.prompts import RESPOND_ACTION_NAME, RESPOND_ACTION_FIELD_NAME, REACT_INSTRUCTION
 from arklex.types import EventType, StreamType
-from arklex.utils.graph_state import ConvoMessage, OrchestratorMessage, MessageState, StatusEnum, BotConfig
+from arklex.utils.graph_state import ConvoMessage, OrchestratorMessage, MessageState, StatusEnum, BotConfig, Slot
 from arklex.utils.utils import init_logger, format_chat_history
 from arklex.orchestrator.NLU.nlu import NLU
 from arklex.utils.trace import TraceRunName
@@ -78,7 +78,9 @@ class AgentOrg:
         chat_history_copy = copy.deepcopy(chat_history)
         chat_history_copy.append({"role": self.user_prefix, "content": text})
         chat_history_str = format_chat_history(chat_history_copy)
-        params["dialog_states"] = params.get("dialog_states", {})
+        dialog_states = params.get("dialog_states", {})
+        if dialog_states:
+            params["dialog_states"] = {tool: [Slot(**slot_data) for slot_data in slots] for tool, slots in dialog_states.items()}
         metadata = params.get("metadata", {})
         metadata["chat_id"] = metadata.get("chat_id", str(uuid.uuid4()))
         metadata["turn_id"] = metadata.get("turn_id", 0) + 1
@@ -263,6 +265,8 @@ class AgentOrg:
         response = response_state.get("response", "")
         params["metadata"]["tool_response"] = {}
         # TODO: params["metadata"]["worker"] is not serialization, make it empty for now
+        if params.get("dialog_states"):
+            params["dialog_states"] = {tool: [s.model_dump() for s in slots] for tool, slots in params["dialog_states"].items()}
         params["metadata"]["worker"] = {}
         params["tool_response"] = tool_response
         output = {
