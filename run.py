@@ -9,7 +9,6 @@ import atexit
 from dotenv import load_dotenv
 from pprint import pprint
 
-from langchain_openai import ChatOpenAI
 import shopify
 
 from arklex.utils.utils import init_logger
@@ -81,10 +80,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-dir', type=str, default="./examples/test")
     parser.add_argument('--model', type=str, default=MODEL["model_type_or_path"])
+    parser.add_argument('--llm-provider', type=str, default=MODEL["llm_provider"])
     parser.add_argument('--log-level', type=str, default="WARNING", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     args = parser.parse_args()
     os.environ["DATA_DIR"] = args.input_dir
     MODEL["model_type_or_path"] = args.model
+    MODEL["llm_provider"] = args.llm_provider
     log_level = getattr(logging, args.log_level.upper(), logging.WARNING)
     logger = init_logger(log_level=log_level, filename=os.path.join(os.path.dirname(__file__), "logs", "arklex.log"))
 

@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 
 import langsmith as ls
 
+from arklex.utils.model_config import MODEL
 from arklex.utils.trace import TraceRunName
 from arklex.utils.graph_state import Slots, Slot
-from arklex.orchestrator.NLU.api import nlu_openai, slotfilling_openai
+from arklex.orchestrator.NLU.api import nlu_api, slotfilling_api
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -21,7 +22,8 @@ class NLU:
         data = {
             "text": text,
             "intents": intents,
-            "chat_history_str": chat_history_str
+            "chat_history_str": chat_history_str,
+            "model":MODEL
         }
         if self.url:
             logger.info(f"Using NLU API to predict the intent")
@@ -35,7 +37,7 @@ class NLU:
                 logger.error('Remote Server Error when predicting NLU')
         else:
             logger.info(f"Using NLU function to predict the intent")
-            pred_intent = nlu_openai.predict(**data)
+            pred_intent = nlu_api.predict(**data)
             logger.info(f"pred_intent is {pred_intent}")
 
         with ls.trace(name=TraceRunName.NLU, inputs=data) as rt:
@@ -54,7 +56,8 @@ class SlotFilling:
         logger.info(f"verify slot: {slot}")
         data = {
             "slot": slot.model_dump(),
-            "chat_history_str": chat_history_str
+            "chat_history_str": chat_history_str,
+            "model":MODEL
         }
         if self.url:
             logger.info(f"Using Slot Filling API to verify the slot")
@@ -69,7 +72,7 @@ class SlotFilling:
                 logger.error('Remote Server Error when verifying Slot Filling')
         else:
             logger.info(f"Using Slot Filling function to verify the slot")
-            verification = slotfilling_openai.verify(**data)
+            verification = slotfilling_api.verify(**data)
             verification_needed = verification.verification_needed
             thought = verification.thought
             logger.info(f"verify_needed is {verification_needed}")
@@ -81,8 +84,9 @@ class SlotFilling:
         if not slots: return []
         
         data = {
-            "slots": [slot.model_dump() for slot in slots],
-            "chat_history_str": chat_history_str
+            "slots": [slot.dict() for slot in slots],
+            "chat_history_str": chat_history_str,
+            "model":MODEL
         }
         if self.url:
             logger.info(f"Using Slot Filling API to predict the slots")
@@ -96,7 +100,8 @@ class SlotFilling:
                 logger.error('Remote Server Error when predicting Slot Filling')
         else:
             logger.info(f"Using Slot Filling function to predict the slots")
-            pred_slots = slotfilling_openai.predict(**data).slots
+            pred_slots = slotfilling_api.predict(**data).slots
+            # pred_slots = [Slot(**pred_slot) for pred_slot in pred_slots]
             logger.info(f"pred_slots is {pred_slots}")
         with ls.trace(name=TraceRunName.SlotFilling, inputs=data) as rt:
             rt.end(

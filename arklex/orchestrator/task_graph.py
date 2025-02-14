@@ -6,6 +6,8 @@ import networkx as nx
 import numpy as np
 from langchain_openai import ChatOpenAI
 
+
+from arklex.utils.model_provider_config import PROVIDER_MAP
 from arklex.utils.utils import normalize, str_similarity, format_chat_history
 from arklex.utils.graph_state import StatusEnum
 from arklex.orchestrator.NLU.nlu import NLU, SlotFilling
@@ -56,7 +58,9 @@ class TaskGraph(TaskGraphBase):
                 }
             }
         self.initial_node = self.get_initial_flow()
-        self.model = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        self.model = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         self.nluapi = NLU(self.product_kwargs.get("nluapi"))
         self.slotfillapi = SlotFilling(self.product_kwargs.get("slotfillapi"))
 

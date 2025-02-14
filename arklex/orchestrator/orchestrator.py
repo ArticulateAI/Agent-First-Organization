@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Tuple
 import ast
 import copy
 from arklex.env.env import Env
+from arklex.utils.utils import format_messages_by_provider
 import janus
 from dotenv import load_dotenv
 
@@ -15,6 +16,7 @@ from langchain_core.runnables import RunnableLambda
 import langsmith as ls
 from openai import OpenAI
 from litellm import completion
+import litellm
 
 from arklex.orchestrator.task_graph import TaskGraph
 from arklex.env.tools.utils import ToolGenerator
@@ -46,14 +48,15 @@ class AgentOrg:
         self.env = env
 
     def generate_next_step(
-        self, messages: List[Dict[str, Any]]
+        self, messages: List[Dict[str, Any]], text:str
     ) -> Tuple[Dict[str, Any], str, float]:
+        litellm.modify_params=True
         res = completion(
-                messages=messages,
-                model=MODEL["model_type_or_path"],
-                custom_llm_provider="openai",
-                temperature=0.0
-            )
+            **format_messages_by_provider(messages, text),
+            model=MODEL["model_type_or_path"],
+            custom_llm_provider=MODEL["llm_provider"],
+            temperature=0.0
+        )
         message = res.choices[0].message
         action_str = message.content.split("Action:")[-1].strip()
         try:
@@ -91,19 +94,6 @@ class AgentOrg:
             params["history"].append(chat_history_copy[-2])
             params["history"].append(chat_history_copy[-1])
 
-        ##### Model safety checking
-        # check the response, decide whether to give template response or not
-        client = OpenAI()
-        text = inputs["text"]
-        moderation_response = client.moderations.create(input=text).model_dump()
-        is_flagged = moderation_response["results"][0]["flagged"]
-        if is_flagged:
-            return_response = {
-                "answer": self.product_kwargs["safety_response"],
-                "parameters": params,
-                "has_follow_up": True
-            }
-            return return_response
 
         ##### TaskGraph Chain
         taskgraph_inputs = {
@@ -243,7 +233,7 @@ class AgentOrg:
                 messages: List[Dict[str, Any]] = [
                     {"role": "system", "content": prompt}
                 ]
-                _, action, _ = self.generate_next_step(messages)
+                _, action, _ = self.generate_next_step(messages, text)
                 logger.info("Predicted action: " + action)
                 if action == RESPOND_ACTION_NAME:
                     FINISH = True
