@@ -5,6 +5,7 @@ import uuid
 import ast
 import inspect
 
+from arklex.env.exceptions import FunctionCallError
 from arklex.utils.graph_state import MessageState, StatusEnum, Slot
 from arklex.orchestrator.NLU.nlu import SlotFilling
 from arklex.utils.utils import format_chat_history
@@ -118,7 +119,10 @@ class Tool:
                                 raise ValueError(f"Unable to parse slot value: {slot.value}")
                 kwargs = {slot.name: slot.value for slot in slots}
                 combined_kwargs = {**kwargs, **fixed_args}
-                response = self.func(**combined_kwargs)
+                try:
+                    response = self.func(**combined_kwargs)
+                except FunctionCallError as e:
+                    response = str(e)
                 logger.info(f"Tool {self.name} response: {response}")
                 call_id = str(uuid.uuid4())
                 state["trajectory"].append({
@@ -142,7 +146,7 @@ class Tool:
                     "name": self.name,
                     "content": response
                 })
-                if "error" in response:
+                if "error" in response: # TODO: use exception
                     max_tries -= 1
                     continue
                 state["status"] = StatusEnum.COMPLETE.value if self.isComplete(response) else StatusEnum.INCOMPLETE.value
