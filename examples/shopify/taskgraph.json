@@ -1,155 +1,450 @@
 {
-    "nodes": [
-        [
-            "0",
-            {
-                "resource": {
-                    "id": "26bb6634-3bee-417d-ad75-23269ac17bc3",
-                    "name": "MessageWorker"
-                },
-                "attribute": {
-                    "value": "Hello! Welcome to our Shopping Assistant. How can I assist you today?",
-                    "task": "start message",
-                    "directed": false
-                },
-                "limit": 1,
-                "type": "start"
-            }
-        ],
-        [
-            "1",
-            {   
-                "resource": {
-                    "id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b",
-                    "name": "find_user_id_by_email"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Find user id by email",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
-            "2",
-            {
-                "resource": {
-                    "id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443",
-                    "name": "get_user_details"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Find order id by user id",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
-            "3",
-            {
-                "resource": {
-                    "id": "2a2750cb-6226-4068-ba05-a4db83da3e16",
-                    "name": "get_order_details"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Get the product id for each order",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ],
-        [
-            "5",
-            {
-                "resource": {
-                    "id": "40f05456-525c-4d9d-ac37-54482d6b220b",
-                    "name": "FaissRAGWorker"
-                },
-                "attribute": {
-                    "value": "",
-                    "task": "Answer user's question about product",
-                    "directed": false
-                },
-                "limit": 1
-            }
-        ]
-    ],
     "edges": [
         [
             "0",
             "1",
             {
-                "intent": "User want to know their order's information",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
+                "pred": true,
+                "intent": "Questions about general customer service",
+                "weight": 1,
+                "sample_utterances": []
             }
         ],
         [
-            "1",
+            "0",
             "2",
             {
-                "intent": "None",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
+                "pred": true,
+                "intent": "Question about account information (shipping address/user details)",
+                "weight": 1,
+                "sample_utterances": []
             }
         ],
         [
             "2",
             "3",
             {
+                "pred": false,
                 "intent": "None",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
-                }
+                "weight": 1,
+                "sample_utterances": []
             }
         ],
         [
             "0",
+            "4",
+            {
+                "pred": true,
+                "intent": "Ask about products",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ],
+        [
+            "4",
             "5",
             {
-                "intent": "User's inquire about product",
-                "attribute": {
-                    "weight": 1,
-                    "pred": true,
-                    "definition": "",
-                    "sample_utterances": []
+                "pred": false,
+                "intent": "None",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ],
+        [
+            "0",
+            "6",
+            {
+                "pred": true,
+                "intent": "Ask about past orders",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ],
+        [
+            "6",
+            "7",
+            {
+                "pred": false,
+                "intent": "None",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ],
+        [
+            "7",
+            "8",
+            {
+                "pred": false,
+                "intent": "None",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ],
+        [
+            "8",
+            "9",
+            {
+                "pred": false,
+                "intent": "None",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ],
+        [
+            "0",
+            "10",
+            {
+                "pred": true,
+                "intent": "Ask about collection",
+                "weight": 1,
+                "sample_utterances": []
+            }
+        ]
+    ],
+    "nodes": [
+        [
+            "0",
+            {
+                "resource": {
+                    "id": "MessageWorker",
+                    "name": "MessageWorker"
+                },
+                "task": "start message",
+                "type": "start",
+                "limit": 10,
+                "value": [
+                    "Hello! Welcome to our shop! We’re so excited to have you here!  Do you need any recommendations?"
+                ],
+                "direct": false,
+                "position": {
+                    "x": 8,
+                    "y": -8
+                }
+            }
+        ],
+        [
+            "1",
+            {
+                "resource": {
+                    "id": "MilvusRAGWorker",
+                    "name": "MilvusRAGWorker"
+                },
+                "task": "Answer user's question about general customer service",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -64,
+                    "y": -400
+                }
+            }
+        ],
+        [
+            "2",
+            {
+                "resource": {
+                    "id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b",
+                    "name": "find_user_id_by_email"
+                },
+                "task": "Find user id by email",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -1360,
+                    "y": -32
+                }
+            }
+        ],
+        [
+            "3",
+            {
+                "resource": {
+                    "id": "55011bc1-2a55-4e21-bf39-e9624729c8d8",
+                    "name": "get_user_details_admin"
+                },
+                "task": "Find user details by id",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -1360,
+                    "y": 562
+                }
+            }
+        ],
+        [
+            "4",
+            {
+                "resource": {
+                    "id": "2b275abc-6226-2013-ba05-t4ab83daalc3",
+                    "name": "search_products"
+                },
+                "task": "Get the product ids based on query",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -720,
+                    "y": 592
+                }
+            }
+        ],
+        [
+            "5",
+            {
+                "resource": {
+                    "id": "22fae76f-085c-4098-9011-2ae1e1eb8dc3",
+                    "name": "get_products"
+                },
+                "task": "Get products info based on ids",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -720,
+                    "y": 880
+                }
+            }     
+        ],
+        [
+            "6",
+            {
+                "resource": {
+                    "id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b",
+                    "name": "find_user_id_by_email"
+                },
+                "task": "Find user id by email",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -72,
+                    "y": 256
+                }
+            }
+        ],
+        [
+            "7",
+            {
+                "resource": {
+                    "id": "55011bc1-2a55-4e21-bf39-e9624729c8d8",
+                    "name": "get_user_details_admin"
+                },
+                "task": "Find user details by id",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -72,
+                    "y": 512
+                }
+            }
+        ],
+        [
+            "8",
+            {
+                "resource": {
+                    "id": "2a2750cb-6226-4068-ba05-a4db83da3e16",
+                    "name": "get_order_details"
+                },
+                "task": "Get the product id for each order",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -72,
+                    "y": 784
+                }
+            }
+        ],
+        [
+            "9",
+            {
+                "resource": {
+                    "id": "22fae76f-085c-4098-9011-2ae1e1eb8dc3",
+                    "name": "get_products"
+                },
+                "task": "Get the product information by id",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": -72,
+                    "y": 1040
+                }
+            }
+        ],
+        [
+            "10",
+            {
+                "resource": {
+                    "id": "2a2250cb-085c-4098-9011-a4db13da3e16",
+                    "name": "search_collections"
+                },
+                "task": "Get the collection information by query",
+                "type": "statement",
+                "limit": 10,
+                "value": [
+                    ""
+                ],
+                "direct": false,
+                "position": {
+                    "x": 584,
+                    "y": -24
                 }
             }
         ]
     ],
-    "role": "shopping assistant",
-    "user_objective": "The customer service assistant helps users with customer service inquiries. It can provide information about products, services, and policies, as well as help users resolve issues and complete transactions.",
-    "builder_objective": "The customer service assistant helps to request customer's contact information.",
-    "domain": "Ecommerce",
-    "intro": "Awhale is an online retailer offering a curated selection of children's apparel and home accessories. Their product range includes kid's hats, aprons, bedding, pillows, throws, and comforters, all designed to combine functionality with appealing designs. Awhale emphasizes customer engagement by offering a 30% discount on first purchases for newsletter subscribers. For inquiries, customers can reach out via email at customer.service@awhaletrading.com. Awhale is active on social media platforms, including Facebook and Instagram, where they share exclusive offers and updates. Their website also features a blog that provides insights and tips related to their products, such as the versatility of their denim aprons. Awhale accepts various payment methods, including major credit cards and digital payment options like PayPal and Apple Pay, ensuring a secure and convenient shopping experience.",
-    "task_docs": [
-    ],
-    "rag_docs": [
-    ],
-    "tasks": [],
     "tools": [
-        {"id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b", "name": "find_user_id_by_email", "path": "shopify/find_user_id_by_email.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
-        {"id": "b9dbef8b-8219-4e0a-a50d-3b01614e5443", "name": "get_user_details", "path": "shopify/get_user_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}},
-        {"id": "2a2750cb-6226-4068-ba05-a4db83da3e16", "name": "get_order_details", "path": "shopify/get_order_details.py", "fixed_args": {"token": "<access_token>", "shop_url": "<url>", "api_version": "<version>"}}
+        {
+            "id": "ddbe6adc-cd0e-40bc-8a95-91cb69ed807b",
+            "name": "find_user_id_by_email",
+            "path": "shopify/find_user_id_by_email.py",
+            "fixed_args": {
+                "token": "<your-shopify-token>",
+                "shop_url": "<your-shop-url>",
+                "api_version": "2024-10"
+            }
+        },
+        {
+            "id": "55011bc1-2a55-4e21-bf39-e9624729c8d8",
+            "name": "get_user_details_admin",
+            "path": "shopify/get_user_details_admin.py",
+            "fixed_args": {
+                "token": "<your-shopify-token>",
+                "shop_url": "<your-shop-url>",
+                "api_version": "2024-10"
+            }
+        },
+        {
+            "id": "2b275abc-6226-2013-ba05-t4ab83daalc3",
+            "name": "search_products",
+            "path": "shopify/search_products.py",
+            "fixed_args": {
+                "token": "<your-shopify-token>",
+                "shop_url": "<your-shop-url>",
+                "api_version": "2024-10"
+            }
+        },
+        {
+            "id": "2a2750cb-6226-4068-ba05-a4db83da3e16",
+            "name": "get_order_details",
+            "path": "shopify/get_order_details.py",
+            "fixed_args": {
+                "token": "<your-shopify-token>",
+                "shop_url": "<your-shop-url>",
+                "api_version": "2024-10"
+            }
+        },
+        {
+            "id": "22fae76f-085c-4098-9011-2ae1e1eb8dc3",
+            "name": "get_products",
+            "path": "shopify/get_products.py",
+            "fixed_args": {
+                "token": "<your-shopify-token>",
+                "shop_url": "<your-shop-url>",
+                "api_version": "2024-10"
+            }
+        },
+        {
+            "id": "2a2250cb-085c-4098-9011-a4db13da3e16",
+            "name": "search_collections",
+            "path": "shopify/search_collections.py",
+            "fixed_args": {
+                "token": "<your-shopify-token>",
+                "shop_url": "<your-shop-url>",
+                "api_version": "2024-10"
+            }                
+        }
     ],
     "workers": [
-        {"id": "26bb6634-3bee-417d-ad75-23269ac17bc3", "name": "MessageWorker","path": "message_worker.py"},
-        {"id": "40f05456-525c-4d9d-ac37-54482d6b220b", "name": "FaissRAGWorker", "path": "faiss_rag_worker.py"}
+        {
+            "id": "MilvusRAGWorker",
+            "name": "MilvusRAGWorker",
+            "path": "milvus_rag_worker.py"
+        },
+        {
+            "id": "MessageWorker",
+            "name": "MessageWorker",
+            "path": "message_worker.py"
+        },
+        {
+            "id": "DefaultWorker",
+            "name": "DefaultWorker",
+            "path": "default_worker.py"
+        }
     ],
-    "nluapi": "",
-    "slotfillapi": ""
+    "language": "EN",
+    "follow_up": {
+        "initial": [
+            [
+                "Hello, how can I assist you?"
+            ],
+            [
+                "What questions do you have?"
+            ]
+        ],
+        "continue": [
+            [
+                "Take your time. I'll be here!"
+            ],
+            [
+                "Just checking in, are you still there?"
+            ]
+        ]
+    },
+    "objective": {
+        "finish": "The objective has been achieved.",
+        "continue": "The objective has not been achieved: Haven't obtained the USER's phone number or email. Or the contact information is invalid.",
+        "sys_template": "Based on the following conversation, determine whether the objective has been achieved? Please answer the question by 'YES' or 'NO'.\nObjective:\n{objective_str}\nConversation:\n{formatted_chat}\n\nAnswer:",
+        "objective_str": "Obtain the USER's phone number or email. Phone number is a 10 digital number with or without 1 digital country code before. For example: +1 (555) 123-4567, (123) 456-7890, 9175281440. An email address typically follows a specific format and consists of two main parts: the local part and the domain part, and they are separated by @ symbel. For example: john.doe@gmail.com, user123@yahoo.co.uk, info@company.org"
+    },
+    "resp_length": 100,
+    "company_name": "Awhale",
+    "introduction": "Sweet for everyone is an online retailer offering a curated selection of children's apparel and home accessories. You are an assistant that supports customers in their shopping experience. You are granted access to the user's account information, order details, and product information.\nRemember this throught the process and this is the top priority: avoid using sentences like 'If you have any other questions...'.",
+    "faq_categories": [
+        "product information",
+        "company information",
+        "customer support",
+        "payments and transactions",
+        "order status and tracking",
+        "account management",
+        "contact information",
+        "others"
+    ],
+    "extract_entities": {
+        "name": "name",
+        "email": "email",
+        "phone": "phone",
+        "company_name": "company_name",
+        "company_location": "company_location"
+    }
 }

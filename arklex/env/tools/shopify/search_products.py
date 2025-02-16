@@ -1,12 +1,14 @@
 import json
 from typing import Any, Dict
 import shopify
-import logging
 
-from arklex.env.tools.shopify.utils import *
+# general GraphQL navigation utilities
+from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
+from arklex.env.tools.shopify.utils_nav import *
+from arklex.env.tools.shopify.utils import authorify
+
+# Admin API
 from arklex.env.tools.tools import register_tool
-
-logger = logging.getLogger(__name__)
 
 description = "Search products by string query. If no products are found, the function will return an error message."
 slots = [
@@ -17,19 +19,16 @@ slots = [
         "prompt": "In order to proceed, please provide a query for the products search.",
         "required": False,
     },
-] + PAGEINFO_SLOTS
+    *PAGEINFO_SLOTS
+] 
 outputs = [
-    {
-        "name": "products_list",
-        "type": "dict",
-        "description": "A list of up to limit number of products that satisfies the query. Such as \"[{'id': 'gid://shopify/Product/7296580845681'}, {'id': 'gid://shopify/Product/7296580878449'}, {'id': 'gid://shopify/Product/7296581042289'}]\"",
-    }
-] + PAGEINFO_OUTPUTS
+    ShopifyOutputs.PRODUCTS_LIST,
+    *PAGEINFO_OUTPUTS
+]
 PRODUCT_SEARCH_ERROR = "error: product search failed"
 NO_PRODUCTS_FOUND_ERROR = "no products found"
 
 errors = [
-    SHOPIFY_AUTH_ERROR,
     PRODUCT_SEARCH_ERROR,
     NO_PRODUCTS_FOUND_ERROR,
     NAVIGATE_WITH_NO_CURSOR,
@@ -38,39 +37,19 @@ errors = [
 ]
 
 @register_tool(description, slots, outputs, lambda x: x[0] not in errors)
-def search_products(query: str, limit=10, navigate='stay', pageInfo=None, **kwargs) -> str:
-    limit = limit or 10
-    navigate = navigate or 'stay'
-    
-    shop_url = kwargs.get("shop_url")
-    api_version = kwargs.get("api_version")
-    token = kwargs.get("token")
-
-    if not shop_url or not api_version or not token:
-        return SHOPIFY_AUTH_ERROR, ''
-    
-    logger.info(f"PARAMS: {query, limit, navigate, pageInfo}")
-    
-    nav = f'first: {limit}'
-    if navigate != 'stay':
-        if not pageInfo:
-            return NAVIGATE_WITH_NO_CURSOR, ''
-        
-        if navigate == 'next':
-            if not pageInfo['hasNextPage']:
-                return NO_NEXT_PAGE, ''
-            nav = f"first: {limit}, after: \"{pageInfo['endCursor']}\""
-            
-        elif navigate == 'prev': 
-            if not pageInfo['hasPreviousPage']:
-                return NO_PREV_PAGE, ''
-            nav = f"last: {limit}, before: \"{pageInfo['startCursor']}\""
+def search_products(query: str, **kwargs) -> str:
+    nav = cursorify(kwargs)
+    if not nav[1]:
+        return nav[0]
+    auth = authorify(kwargs)
+    if auth["error"]:
+        return auth["error"]
     
     try:
-        with shopify.Session.temp(shop_url, api_version, token):
+        with shopify.Session.temp(**auth["value"]):
             response = shopify.GraphQL().execute(f"""
                 {{
-                    products ({nav}, query: "{query}") {{
+                    products ({nav[0]}, query: "{query}") {{
                         nodes {{
                             id
                         }}
@@ -84,14 +63,13 @@ def search_products(query: str, limit=10, navigate='stay', pageInfo=None, **kwar
                 }}
             """)
         
-        data = json.loads(response)['data']['products']
-        nodes = data['nodes']
-        pageInfo = data['pageInfo']
-        if len(nodes):
-            return nodes, pageInfo
-        else:
-            return NO_PRODUCTS_FOUND_ERROR, ''
+            data = json.loads(response)['data']['products']
+            nodes = data['nodes']
+            pageInfo = data['pageInfo']
+            if len(nodes):
+                return nodes, pageInfo
+            else:
+                return NO_PRODUCTS_FOUND_ERROR, ''
     
     except Exception as e:
-        logger.info(e)
         return PRODUCT_SEARCH_ERROR, ''
