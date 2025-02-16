@@ -114,5 +114,5 @@ Here is an exmaple of the generated TaskGraph for the customer service assistant
 * `nodes`: The nodes in the TaskGraph, each node contains the worker name, task, and the directed attribute.
 * `edges`: The edges in the TaskGraph, each edge contains the intent, weight, pred, definition, and sample_utterances.
 * fileds in the config file: role, user_objective, builder_objective, domain, intro, task_docs, rag_docs, tasks, workers
-* nluapi: It will automatically add the default NLU api which use the `NLUOpenAIAPI` service defined under `./agentorg/orchestrator/NLU/api.py` file. If you want to customize the NLU api, you can change the `nluapi` field to your own NLU api url.
-* slotfillapi: It will automatically add the default SlotFill api which use the `SlotFillOpenAIAPI` service defined under `./agentorg/orchestrator/NLU/api.py` file. If you want to customize the SlotFill api, you can change the `slotfillapi` field to your own SlotFill api url.
+* nluapi: It will automatically add the default NLU api which use the `NLUModelAPI ` service defined under `./agentorg/orchestrator/NLU/api.py` file. If you want to customize the NLU api, you can change the `nluapi` field to your own NLU api url.
+* slotfillapi: It will automatically add the default SlotFill api which use the `SlotFillModelAPI` service defined under `./agentorg/orchestrator/NLU/api.py` file. If you want to customize the SlotFill api, you can change the `slotfillapi` field to your own SlotFill api url.

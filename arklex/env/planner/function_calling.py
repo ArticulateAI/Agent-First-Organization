@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import traceback
 
 from litellm import completion
+import litellm
 
 from arklex.utils.graph_state import MessageState
 from arklex.utils.model_config import MODEL
@@ -62,19 +63,20 @@ class FunctionCallingPlanner:
         for _ in range(max_num_steps):
             logger.info(f"messages in function calling: {messages}")
             logger.info(f"tools_info in function calling: {self.tools_info}")
+            litellm.modify_params = True
             if not self.tools_info:
                 res = completion(
                     messages=messages,
-                    model=MODEL["model_type_or_path"],
-                    custom_llm_provider="openai",
+                    model=MODEL['model_type_or_path'],
+                    custom_llm_provider=MODEL["llm_provider"],
                     temperature=0.0
                 )
             else:
                 res = completion(
                     messages=messages,
                     model=MODEL["model_type_or_path"],
-                    custom_llm_provider="openai",
-                    tools=self.tools_info,
+                    custom_llm_provider=MODEL["llm_provider"],
+                    tools= convert_to_gemini_tools(self.tools_info) if MODEL['llm_provider'] == 'gemini' else self.tools_info,
                     temperature=0.0
                 )
             next_message = res.choices[0].message.model_dump()
@@ -136,3 +138,25 @@ class FunctionCallingPlanner:
         msg_history, action, response = self.plan(msg_state, msg_history)
         msg_state['response'] = response
         return action, msg_state, msg_history
+
+
+def convert_to_gemini_tools(tools):
+    converted_tools = {
+        "tools": [
+            {
+                "function_declarations": []
+            }
+        ]
+    }
+    for tool in tools:
+        if 'function' in tool:
+            converted_tool = {
+                "name": tool["function"]["name"],
+                "description": tool["function"]["description"],
+                "parameters": tool["function"]["parameters"]
+            }
+            converted_tools["tools"][0]["function_declarations"].append(converted_tool)
+        else:
+            converted_tools["tools"].append(tool)
+
+    return converted_tools

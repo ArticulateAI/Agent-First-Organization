@@ -9,6 +9,7 @@ from arklex.env.prompts import load_prompts
 from arklex.utils.utils import chunk_string
 from arklex.utils.graph_state import MessageState
 from arklex.utils.model_config import MODEL
+from arklex.utils.model_provider_config import PROVIDER_MAP
 
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,9 @@ class DefaultWorker(BaseWorker):
 
     def __init__(self):
         super().__init__()
-        self.llm = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        self.llm = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         self.base_choice = "MessageWorker"
 
     def _choose_worker(self, state: MessageState, limit=2):

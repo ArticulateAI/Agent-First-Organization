@@ -3,6 +3,7 @@ import sys
 import json
 import logging
 from logging.handlers import RotatingFileHandler
+from arklex.utils.model_config import MODEL
 
 import tiktoken
 import Levenshtein
@@ -109,3 +110,12 @@ def format_chat_history(chat_history):
     for turn in chat_history:
         chat_history_str += f"{turn['role']}: {turn['content']}\n"
     return chat_history_str.strip()
+
+def format_messages_by_provider(messages, text, model=MODEL):
+    llm_provider = model['llm_provider']
+    if llm_provider == "anthropic":
+        return {"system": messages[0]['content']}
+    elif llm_provider == 'gemini':
+        messages.append({"role": "user", "content": f"{text}"})
+    return {"messages": messages}
+   

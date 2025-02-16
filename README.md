@@ -14,7 +14,15 @@ pip install arklex
 
 # Preparation
 0. Set up environment
-    * Add `OPENAI_API_KEY` to `.env`
+     * Add the API key for the provider(s) you wish to use to your `.env` file:
+       - **OpenAI**: 
+        `OPENAI_API_KEY`
+       - **Gemini/Google**: 
+        `GEMINI_API_KEY,GOOGLE_API_KEY
+        `
+       - **Anthropic**:
+        `ANTHROPIC_API_KEY
+        `
     * Set `LANGCHAIN_TRACING_V2` to `true` use `LangSmith` Trace [Optional] (In order to use Trace function, you need to create a LangChain account from [here](https://langchain.com/) and create a API key in the settings.)
     * Set `LANGCHAIN_API_KEY` to `.env` if enable Trace.
     * If you are going to use the `SearchWorker`, you need to set up the `TAVILY_API_KEY` to `.env` as well. (In order to use Tavily, you need to create a Tavily account from [here](https://docs.tavily.com/) and create a API key by click [Get API Key](https://app.tavily.com/home).)
@@ -71,9 +79,15 @@ python run.py --input-dir ./examples/customer_service
 
 * Fields:
   * `--input-dir`: The directory that contains the generated files
-  * `--model`: The openai model type used to generate bot response. Default is `gpt-4o`. You could change it to other models like `gpt-4o-mini`.
+  * `--llm_provider`: The LLM provider you wish to use. 
+    - Options: `openai` (default), `gemini`, `anthropic`
+  * `--model`: The model type used to generate bot response. Default is `gpt-4o`. 
+    - You can change this to other models like:
+      - `gpt-4o-mini`
+      - `gemini-2.0-flash-exp`
+      - `claude-3-haiku-20240307`
   
-* It will first automatically start the nluapi and slotapi services through `start_apis()` function. By default, this will start the `NLUOpenAIAPI` and `SlotFillOpenAIAPI` services defined under `./arklex/orchestrator/NLU/api.py` file. You could customize the function based on the nlu and slot models you trained.
+* It will first automatically start the nluapi and slotapi services through `start_apis()` function. By default, this will start the `NLUModelAPI ` and `SlotFillModelAPI` services defined under `./arklex/orchestrator/NLU/api.py` file. You could customize the function based on the nlu and slot models you trained.
 * Then it will start the chatbot and you could chat with the chatbot
 
 

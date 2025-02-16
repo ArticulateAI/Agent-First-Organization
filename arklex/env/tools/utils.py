@@ -9,6 +9,7 @@ from arklex.types import EventType
 from arklex.utils.utils import chunk_string
 from arklex.utils.graph_state import MessageState
 from arklex.utils.model_config import MODEL
+from arklex.utils.model_provider_config import PROVIDER_MAP
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +21,9 @@ class ToolGenerator():
         user_message = state['user_message']
         
         prompts = load_prompts(state["bot_config"])
-        llm = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        llm = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         prompt = PromptTemplate.from_template(prompts["generator_prompt"])
         input_prompt = prompt.invoke({"sys_instruct": state["sys_instruct"], "formatted_chat": user_message.history})
         chunked_prompt = chunk_string(input_prompt.text, tokenizer=MODEL["tokenizer"], max_length=MODEL["context"])
@@ -32,7 +35,9 @@ class ToolGenerator():
 
     @staticmethod
     def context_generate(state: MessageState):
-        llm = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        llm = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         # get the input message
         user_message = state['user_message']
         message_flow = state['message_flow']
@@ -53,7 +58,9 @@ class ToolGenerator():
     
     @staticmethod
     def stream_context_generate(state: MessageState):
-        llm = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        llm = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         # get the input message
         user_message = state['user_message']
         message_flow = state['message_flow']
@@ -81,7 +88,9 @@ class ToolGenerator():
         user_message = state['user_message']
         
         prompts = load_prompts(state["bot_config"])
-        llm = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        llm = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         prompt = PromptTemplate.from_template(prompts["generator_prompt"])
         input_prompt = prompt.invoke({"sys_instruct": state["sys_instruct"], "formatted_chat": user_message.history})
         chunked_prompt = chunk_string(input_prompt.text, tokenizer=MODEL["tokenizer"], max_length=MODEL["context"])

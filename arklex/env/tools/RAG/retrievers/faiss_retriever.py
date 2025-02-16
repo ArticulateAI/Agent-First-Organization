@@ -10,9 +10,11 @@ from langchain_core.documents import Document
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_openai import OpenAIEmbeddings
 
+
 from arklex.utils.model_config import MODEL
 from arklex.env.prompts import load_prompts
 from arklex.utils.graph_state import MessageState
+from arklex.utils.model_provider_config import PROVIDER_MAP, PROVIDER_EMBEDDINGS, PROVIDER_EMBEDDING_MODELS
 
 
 logger = logging.getLogger(__name__)
@@ -37,18 +39,20 @@ class FaissRetrieverExecutor:
             self, 
             texts: List[Document], 
             index_path: str,
-            embedding_model_name: str = "text-embedding-ada-002", 
+            embedding_model_name: str =  PROVIDER_EMBEDDING_MODELS[MODEL['llm_provider']]
         ):
         self.texts = texts
         self.index_path = index_path
         self.embedding_model_name = embedding_model_name
-        self.llm = ChatOpenAI(model=MODEL["model_type_or_path"], timeout=30000)
+        self.llm = PROVIDER_MAP.get(MODEL['llm_provider'], ChatOpenAI)(
+            model=MODEL["model_type_or_path"], timeout=30000
+        )
         self.retriever = self._init_retriever()
 
     def _init_retriever(self, **kwargs):
         # initiate FAISS retriever
-        embedding_model = OpenAIEmbeddings(
-            model=self.embedding_model_name,
+        embedding_model = PROVIDER_EMBEDDINGS.get(MODEL['llm_provider'], OpenAIEmbeddings)(
+            model=self.embedding_model_name
         )
         docsearch = FAISS.from_documents(self.texts, embedding_model)
         retriever = docsearch.as_retriever(**kwargs)

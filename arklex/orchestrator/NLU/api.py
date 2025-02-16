@@ -1,47 +1,60 @@
 import sys
+import os
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 import logging
 import string
 
-from openai import OpenAI
+from openai.lib._parsing import parse_chat_completion
+from openai._types import NOT_GIVEN
+import litellm
+from litellm import completion
 from fastapi import FastAPI, Response
 
 from arklex.utils.graph_state import Slots, Slot, Verification
 from dotenv import load_dotenv
 load_dotenv()
 
+from arklex.utils.utils import format_messages_by_provider
 from arklex.utils.model_config import MODEL
+import google.generativeai as genai
+
 
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT_NLU = """According to the conversation, decide what is the user's intent in the last turn? \nHere are the definitions for each intent:\n{definition}\nHere are some sample utterances from user that indicate each intent:\n{exemplars}\nConversation:\n{formatted_chat}\n\nOnly choose from the following options.\n{intents_choice}\n\nAnswer:
 """
 
-
-class OpenAIAPI:
+class NLUModelAPI ():
     def __init__(self):
-        self.client = OpenAI()
-
-
-class NLUOpenAIAPI(OpenAIAPI):
-    def __init__(self):
-        super().__init__()
         self.user_prefix = "user"
         self.assistant_prefix = "assistant"
 
-    def get_response(self, sys_prompt, response_format="text", debug_text="none", params=MODEL):
+    def get_response(self, sys_prompt, model, response_format="text", debug_text="none",  text=""):
         logger.info(f"gpt system_prompt for {debug_text} is \n{sys_prompt}")
-        dialog_history = {"role": "system", "content": sys_prompt}
-        completion = self.client.chat.completions.create(
-            model=params.get("model_type_or_path", "gpt-4o"),
-            response_format={"type": "json_object"} if response_format=="json" else {"type": "text"},
-            messages=[dialog_history],
-            n=1,
-            temperature = 0.7
-        )
-        response = completion.choices[0].message.content
+        dialog_history = [{"role": "system", "content": sys_prompt}]
+        litellm.modify_params=True
+        if model['llm_provider'] == 'gemini':
+            genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+            llm = genai.GenerativeModel(
+                f"models/{model['model_type_or_path']}",
+                system_instruction=sys_prompt,
+                 generation_config=genai.GenerationConfig(
+                temperature = 0.7, candidate_count = 1, response_mime_type = ' application/json' if response_format == "json" else 'text/plain'
+                ))
+            response = llm.generate_content(" ").text
+        else:
+            res = completion(
+                    model=model["model_type_or_path"],
+                    custom_llm_provider=model["llm_provider"],
+                    response_format={"type": "json_object"} if response_format=="json" else {"type": "text"},
+                    **format_messages_by_provider(dialog_history, text),
+                    n=1,
+                    temperature = 0.7,
+                )
+            response = res.choices[0].message.content
+        
         logger.info(f"response for {debug_text} is \n{response}")
         return response
 
@@ -103,14 +116,15 @@ class NLUOpenAIAPI(OpenAIAPI):
         self,
         text,
         intents,
-        chat_history_str
+        chat_history_str,
+        model
     ) -> str:
 
         system_prompt, idx2intents_mapping = self.format_input(
             intents, chat_history_str
         )
         response = self.get_response(
-            system_prompt, debug_text="get intent"
+            system_prompt,model, debug_text="get intent", text=text
         )
         logger.info(f"postprocessed intent response: {response}")
         try:
@@ -122,23 +136,28 @@ class NLUOpenAIAPI(OpenAIAPI):
         return pred_intent
 
 
-class SlotFillOpenAIAPI(OpenAIAPI):
+class SlotFillModelAPI():
     def __init__(self):
-        super().__init__()
         self.user_prefix = "user"
         self.assistant_prefix = "assistant"
 
-    def get_response(self, sys_prompt, debug_text="none", params=MODEL, format=Slots):
+    def get_response(self, sys_prompt,model, debug_text="none", text=" ", format=Slots):
         logger.info(f"gpt system_prompt for {debug_text} is \n{sys_prompt}")
-        dialog_history = {"role": "system", "content": sys_prompt}
-        completion = self.client.beta.chat.completions.parse(
-            model=params.get("model_type_or_path", "gpt-4o"),
-            messages=[dialog_history],
+        dialog_history = [{"role": "system", "content": sys_prompt}]
+        res = completion(
+            model=model["model_type_or_path"],
+            custom_llm_provider=model["llm_provider"],
             response_format=format,
+            **format_messages_by_provider(dialog_history, text, model),
             n=1,
-            temperature = 0.7
+            temperature = 0.7,
         )
-        response = completion.choices[0].message
+        res.choices[0].message.refusal = None 
+        parsed = parse_chat_completion(response_format=format,
+                                    input_tools = NOT_GIVEN,
+                                 chat_completion=res)
+        
+        response = parsed.choices[0].message
         if (response.refusal):
             return None
         logger.info(f"response for {debug_text} is \n{response.parsed}")
@@ -152,14 +171,16 @@ class SlotFillOpenAIAPI(OpenAIAPI):
     def predict(
         self,
         slots,
-        chat_history_str
+        chat_history_str,
+        model
     ):
         slots = [Slot(**slot_data) for slot_data in slots]
         system_prompt = self.format_input(
             slots, chat_history_str
         )
+        user_input =  chat_history_str.splitlines()[-1].split('user:')[-1].strip()
         response = self.get_response(
-            system_prompt, debug_text="get slots"
+            system_prompt,model, debug_text="get slots", text=user_input
         )
         if not response:
             logger.info(f"Failed to update dialogue states")
@@ -170,12 +191,13 @@ class SlotFillOpenAIAPI(OpenAIAPI):
     def verify(
         self,
         slot: dict,
-        chat_history_str
+        chat_history_str,
+        model
     ) -> Verification:
         reformat_slot = {key: value for key, value in slot.items() if key in ["name", "type", "value", "enum", "description", "required"]}
         system_prompt = f"Given the conversation, definition and extracted value of each dialog state, decide whether the following dialog states values need further verification from the user. If there is a list of enum value, which means the value has to be chosen from the enum list. Only Return boolean value: True or False. \nDialogue Statues:\n{reformat_slot}\nConversation:\n{chat_history_str}\n\n"
         response = self.get_response(
-            system_prompt, debug_text="verify slots", format=Verification
+            system_prompt, model,debug_text="verify slots", format=Verification
         )
         if not response: # no need to verification, we want to make sure it is really confident that we need to ask the question again
             logger.info(f"Failed to verify dialogue states")
@@ -185,14 +207,14 @@ class SlotFillOpenAIAPI(OpenAIAPI):
 
 
 app = FastAPI()
-nlu_openai = NLUOpenAIAPI()
-slotfilling_openai = SlotFillOpenAIAPI()
+nlu_api = NLUModelAPI()
+slotfilling_api = SlotFillModelAPI()
 
 
 @app.post("/nlu/predict")
 def predict(data: dict, res: Response):
     logger.info(f"Received data: {data}")
-    pred_intent = nlu_openai.predict(**data)
+    pred_intent = nlu_api.predict(**data)
 
     logger.info(f"pred_intent: {pred_intent}")
     return {"intent": pred_intent}
@@ -200,7 +222,7 @@ def predict(data: dict, res: Response):
 @app.post("/slotfill/predict")
 def predict(data: dict, res: Response):
     logger.info(f"Received data: {data}")
-    results = slotfilling_openai.predict(**data)
+    results = slotfilling_api.predict(**data)
 
     logger.info(f"pred_slots: {results.slots}")
     return results.slots
@@ -208,7 +230,7 @@ def predict(data: dict, res: Response):
 @app.post("/slotfill/verify")
 def verify(data: dict, res: Response):
     logger.info(f"Received data: {data}")
-    verify_needed = slotfilling_openai.verify(**data)
+    verify_needed = slotfilling_api.verify(**data)
 
     logger.info(f"verify_needed: {verify_needed}")
     return verify_needed
