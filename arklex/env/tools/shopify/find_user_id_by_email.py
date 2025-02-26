@@ -3,6 +3,7 @@ import json
 
 import shopify
 
+from arklex.env.exceptions import AuthenticationError, DataNotFoundError, OutputError
 from arklex.env.tools.tools import register_tool
 from arklex.env.tools.shopify.utils import SHOPIFY_AUTH_ERROR
 
@@ -39,7 +40,7 @@ def find_user_id_by_email(email: str, **kwargs) -> str:
     token = kwargs.get("token")
     
     if not shop_url or not api_version or not token:
-        return SHOPIFY_AUTH_ERROR
+        raise AuthenticationError(SHOPIFY_AUTH_ERROR)
     
     user_id = ""
     
@@ -61,6 +62,6 @@ def find_user_id_by_email(email: str, **kwargs) -> str:
             user_id = nodes[0]["node"]["id"]
             return user_id
         else:
-            return MULTIPLE_USERS_SAME_EMAIL_ERROR
+            raise OutputError(MULTIPLE_USERS_SAME_EMAIL_ERROR)
     except Exception as e:
-        return USER_NOT_FOUND_ERROR
+        raise DataNotFoundError(USER_NOT_FOUND_ERROR)

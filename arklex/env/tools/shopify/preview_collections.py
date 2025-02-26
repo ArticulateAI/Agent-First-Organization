@@ -3,6 +3,7 @@ from typing import Any, Dict
 import shopify
 
 # general GraphQL navigation utilities
+from arklex.env.exceptions import DataNotFoundError
 from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
 from arklex.env.tools.shopify.utils_nav import *
 from arklex.env.tools.shopify.utils import authorify
@@ -64,4 +65,4 @@ def preview_collections(collection_ids: list, **kwargs) -> str:
             pageInfo = results['collections']['pageInfo']
             return response, pageInfo
     except Exception as e:
-        return COLLECTION_NOT_FOUND
+        raise DataNotFoundError(COLLECTION_NOT_FOUND)

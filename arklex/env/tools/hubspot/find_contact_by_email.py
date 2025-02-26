@@ -1,4 +1,6 @@
 from datetime import datetime, timezone
+
+from arklex.env.exceptions import AuthenticationError, DataNotFoundError
 from ..tools import register_tool, logger
 import hubspot
 from hubspot.crm.objects.emails import PublicObjectSearchRequest, ApiException
@@ -45,7 +47,7 @@ def find_contact_by_email(email: str, chat: str, **kwargs) -> str:
     access_token = kwargs.get('access_token')
 
     if not access_token:
-        return HUBSPOT_AUTH_ERROR
+        raise AuthenticationError(HUBSPOT_AUTH_ERROR)
 
     api_client = hubspot.Client.create(access_token=access_token)
     public_object_search_request = PublicObjectSearchRequest(
@@ -107,7 +109,7 @@ def find_contact_by_email(email: str, chat: str, **kwargs) -> str:
                 logger.info("Exception when calling basic_api: %s\n" % e)
             return str(contact_info_properties)
         else:
-            return USER_NOT_FOUND_ERROR
+            raise DataNotFoundError(USER_NOT_FOUND_ERROR)
     except ApiException as e:
         logger.info("Exception when calling search_api: %s\n" % e)
 

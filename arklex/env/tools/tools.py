@@ -5,6 +5,7 @@ import uuid
 import ast
 import inspect
 
+from arklex.env.exceptions import FunctionCallError
 from arklex.utils.graph_state import MessageState, StatusEnum, Slot
 from arklex.orchestrator.NLU.nlu import SlotFilling
 from arklex.utils.utils import format_chat_history
@@ -72,6 +73,17 @@ class Tool:
         
     def init_slotfilling(self, slotfillapi: SlotFilling):
         self.slotfillapi = slotfillapi
+
+    def _tool_call(self, func):
+        """Perform tool call and return (response: string, is_successful: bool)"""
+        try:
+            response = func()
+            return response, True
+        except FunctionCallError as e:
+            return str(e), False
+        except Exception as e:
+            logger.error("Unexpected error: " + str(e))
+            return str(e), False
         
     def _execute(self, state: MessageState, **fixed_args):
         # if this tool has been called before, then load the previous slots status
@@ -119,7 +131,7 @@ class Tool:
                                 raise ValueError(f"Unable to parse slot value: {slot.value}")
                 kwargs = {slot.name: slot.value for slot in slots}
                 combined_kwargs = {**kwargs, **fixed_args}
-                response = self.func(**combined_kwargs)
+                response, is_successful = self._tool_call(lambda: self.func(**combined_kwargs))
                 logger.info(f"Tool {self.name} response: {response}")
                 call_id = str(uuid.uuid4())
                 state["trajectory"].append({
@@ -143,10 +155,12 @@ class Tool:
                     "name": self.name,
                     "content": response
                 })
-                if "error" in response:
+                if not is_successful or "error" in response: # TODO: remove the second condition, use custom exception only
                     max_tries -= 1
                     continue
-                state["status"] = StatusEnum.COMPLETE.value if self.isComplete(response) else StatusEnum.INCOMPLETE.value
+                state["status"] = StatusEnum.COMPLETE.value \
+                                if is_successful and self.isComplete(response) \
+                                else StatusEnum.INCOMPLETE.value
                 
         state["message_flow"] = response
         state["slots"][self.name] = slots
@@ -163,4 +177,5 @@ class Tool:
 
     def __repr__(self):
         return f"{self.__class__.__name__}"
+    
     

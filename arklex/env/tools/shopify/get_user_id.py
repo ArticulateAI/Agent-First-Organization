@@ -13,6 +13,7 @@ This file contains the code for getting the user id by refresh token.
 """
 from typing import Any, Dict
 
+from arklex.env.exceptions import DataNotFoundError
 from arklex.env.tools.tools import register_tool
 
 # Customer API
@@ -36,4 +37,4 @@ def get_user_id(refresh_token) -> str:
     try:
         return get_id(refresh_token)
     except Exception:
-        return USER_NOT_FOUND_ERROR
+        raise DataNotFoundError(USER_NOT_FOUND_ERROR)

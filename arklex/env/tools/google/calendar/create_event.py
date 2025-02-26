@@ -4,6 +4,7 @@ import json
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 
+from arklex.env.exceptions import APISpecificError, AuthenticationError, ParameterMismatchError
 from arklex.env.tools.tools import register_tool
 from arklex.env.tools.google.calendar.utils import AUTH_ERROR
 
@@ -68,7 +69,7 @@ def create_event(email:str, event: str, start_time: str, timezone: str, duration
         # Build the Google Calendar API service
         service = build('calendar', 'v3', credentials=credentials)
     except Exception as e:
-        return AUTH_ERROR
+        raise AuthenticationError(AUTH_ERROR)
 
     # Specify the calendar ID (use 'primary' or the specific calendar's ID)
     calendar_id = 'primary'
@@ -88,7 +89,7 @@ def create_event(email:str, event: str, start_time: str, timezone: str, duration
         end_time = end_time_obj.isoformat()
 
     except Exception as e:
-        return DATETIME_ERROR
+        raise ParameterMismatchError("", "", "", message=DATETIME_ERROR)
     
     try:
 
@@ -113,7 +114,7 @@ def create_event(email:str, event: str, start_time: str, timezone: str, duration
         print('Event created: %s' % (event.get('htmlLink')))
 
     except Exception as e:
-        return EVENT_CREATION_ERROR.format(error=e)
+        raise APISpecificError(message=EVENT_CREATION_ERROR.format(error=e))
 
     # return SUCCESS.format(start_time=start_time, email=email)
     return json.dumps(event)

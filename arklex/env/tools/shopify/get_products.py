@@ -5,6 +5,7 @@ import logging
 import shopify
 
 # general GraphQL navigation utilities
+from arklex.env.exceptions import DataNotFoundError
 from arklex.env.tools.shopify.utils_nav import *
 from arklex.env.tools.shopify.utils import authorify
 
@@ -78,5 +79,5 @@ def get_products(product_ids: list, **kwargs) -> str:
             pageInfo = result["pageInfo"]
             return response, pageInfo
     except Exception as e:
-        return PRODUCTS_NOT_FOUND
+        raise DataNotFoundError(PRODUCTS_NOT_FOUND)
     

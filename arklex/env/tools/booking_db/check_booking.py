@@ -1,3 +1,4 @@
+from arklex.env.exceptions import AuthenticationError
 from ..tools import register_tool
 from .utils import *
 
@@ -14,7 +15,8 @@ import pandas as pd
     lambda x: x and x not in (LOG_IN_FAILURE, 'No bookings found.')
 )
 def check_booking() -> str | None:
-    if not log_in(): return LOG_IN_FAILURE
+    if not log_in():
+        raise AuthenticationError(LOG_IN_FAILURE)
     
     logger.info("Enter check booking function")
     conn = sqlite3.connect(booking.db_path)

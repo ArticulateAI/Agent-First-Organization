@@ -3,6 +3,7 @@ from typing import Any, Dict
 import logging
 
 
+from arklex.env.exceptions import DataNotFoundError
 from arklex.env.tools.tools import register_tool
 
 # general GraphQL navigation utilities
@@ -79,4 +80,4 @@ def get_order_admin(order_id: str, **kwargs) -> str:
         pageInfo = results['lineItems']['pageInfo']
         return results, pageInfo
     except Exception as e:
-        return ORDERS_NOT_FOUND
+        raise DataNotFoundError(ORDERS_NOT_FOUND)

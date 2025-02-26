@@ -11,6 +11,7 @@ from langchain_openai import ChatOpenAI
 from litellm import completion
 import litellm
 
+from arklex.env.exceptions import FunctionCallError
 from arklex.utils.graph_state import MessageState
 from arklex.utils.model_config import MODEL
 from arklex.utils.model_provider_config import PROVIDER_MAP
@@ -138,8 +139,20 @@ class FunctionCallingPlanner:
 
         return EnvResponse(observation=observation)
     
+    def _plan_call(self, func, old_msg_history):
+        """Perform plan call and return (msg_history: Any, action: string, response: string, is_completed: bool)"""
+        try:
+            msg_history, action, response = func()
+            return msg_history, action, response, True
+        except FunctionCallError as e:
+            return old_msg_history, RESPOND_ACTION_NAME, str(e), False
+        except Exception as e:
+            logger.error("Unexpected error: " + str(e))
+            return old_msg_history, RESPOND_ACTION_NAME, str(e), False
+        
     def execute(self, msg_state: MessageState, msg_history):
-        msg_history, action, response = self.plan(msg_state, msg_history)
+        plan_func = lambda: self.plan(msg_state, msg_history)
+        msg_history, action, response, is_completed = self._plan_call(plan_func, msg_history)
         msg_state['response'] = response
         return action, msg_state, msg_history
 

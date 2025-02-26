@@ -13,6 +13,7 @@ This file contains the code for getting the status and details of an order.
 """
 from typing import Any, Dict
 
+from arklex.env.exceptions import DataNotFoundError, FunctionFailureError
 from arklex.env.tools.tools import register_tool
 
 # general GraphQL navigation utilities
@@ -76,9 +77,9 @@ def get_order(refresh_token, order_id: str, **kwargs) -> str:
         try:
             response = make_query(customer_url, body, {}, customer_headers | auth)['data']['order']
         except Exception as e:
-            return f"error: {e}"
+            raise FunctionFailureError(f"error: {e}")
         
         pageInfo = response['lineItems']['pageInfo']
         return response, pageInfo
     except Exception as e:
-        return ORDERS_NOT_FOUND
+        raise DataNotFoundError(ORDERS_NOT_FOUND)

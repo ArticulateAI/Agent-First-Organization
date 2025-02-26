@@ -13,6 +13,7 @@ This file contains the code for getting the details of a user.
 """
 from typing import Any, Dict
 
+from arklex.env.exceptions import FunctionFailureError, PermissionDeniedError
 from arklex.env.tools.tools import register_tool
 
 # Customer API
@@ -36,7 +37,7 @@ errors = [USER_NOT_FOUND_ERROR]
 
 
 @register_tool(description, slots, outputs, lambda x: x not in errors)
-def get_user_details(refresh_token: str, **kwargs) -> str:
+def get_user_details(refresh_token: str, **kwargs):
     nav = cursorify(kwargs)
     if not nav[1]: 
         return nav[0]
@@ -79,10 +80,10 @@ def get_user_details(refresh_token: str, **kwargs) -> str:
         try:
             response = make_query(customer_url, body, {}, customer_headers | auth)['data']['customer']
         except Exception as e:
-            return f"error: {e}"
+            raise FunctionFailureError(f"error: {e}")
         
         pageInfo = response['orders']['pageInfo']
         return response, pageInfo
     
     except Exception:
-        raise PermissionError
+        raise PermissionDeniedError()

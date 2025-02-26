@@ -1,3 +1,4 @@
+from arklex.env.exceptions import AuthenticationError
 from ..tools import register_tool
 from .utils import *
 
@@ -11,10 +12,11 @@ import pandas as pd
         "type": "str",
         "description": "A string listing the show that was cancelled",
     }],
-    lambda x: x and x not in (LOG_IN_FAILURE, NO_BOOKING_MESSAGE)
+    lambda x: x and x not in (LOG_IN_FAILURE, NO_BOOKING_MESSAGE, MULTIPLE_SHOWS_MESSAGE)
 )
 def cancel_booking() -> str | None:
-    if not log_in(): return LOG_IN_FAILURE  
+    if not log_in(): 
+        raise AuthenticationError(LOG_IN_FAILURE)
     
     logger.info("Enter cancel booking function")
     conn = sqlite3.connect(booking.db_path)

@@ -6,6 +6,7 @@ from typing import Optional
 
 from arklex.env.tools.tools import Tool
 from arklex.env.planner.function_calling import FunctionCallingPlanner
+from arklex.env.workers.worker import BaseWorker
 from arklex.utils.graph_state import StatusEnum
 from arklex.orchestrator.NLU.nlu import SlotFilling
 
@@ -99,15 +100,15 @@ class Env():
         elif id in self.workers:
             message_state["metadata"]["worker"] = self.workers
             logger.info(f"{self.workers[id]['name']} worker selected")
-            worker = self.workers[id]["execute"]()
-            response_state = worker.execute(message_state)
+            worker: BaseWorker = self.workers[id]["execute"]()
+            response_state, is_completed = worker.worker_call(lambda: worker.execute(message_state))
             call_id = str(uuid.uuid4())
             params["history"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': "{}", 'name': self.id2name[id]}, 'id': call_id, 'type': 'function'}], 'function_call': None})
             params["history"].append({
                         "role": "tool",
                         "tool_call_id": call_id,
                         "name": self.id2name[id],
-                        "content": response_state["response"]
+                        "content": response_state["response"] if is_completed else response_state
             })
         else:
             logger.info("planner selected")
@@ -115,3 +116,5 @@ class Env():
         
         logger.info(f"Response state from {id}: {response_state}")
         return response_state, params
+
+    # def expection_handler()

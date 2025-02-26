@@ -11,6 +11,7 @@ Module Name: cart_update_items
 
 This file contains the code for updating items in a shopping cart.
 """
+from arklex.env.exceptions import FunctionFailureError
 from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
 from arklex.env.tools.shopify.utils_cart import *
 from arklex.env.tools.shopify.utils_nav import *
@@ -57,4 +58,4 @@ def cart_update_items(cart_id, items):
         make_query(cart_url, query, variable, cart_headers)
         return 
     except:
-        return CART_UPDATE_ITEM_ERROR
+        raise FunctionFailureError(CART_UPDATE_ITEM_ERROR)

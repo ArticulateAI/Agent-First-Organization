@@ -1,3 +1,4 @@
+from arklex.env.exceptions import AuthenticationError
 from ..tools import register_tool
 from .utils import *
 
@@ -20,7 +21,8 @@ import pandas as pd
     lambda x: x and x not in (LOG_IN_FAILURE, NO_SHOW_MESSAGE, MULTIPLE_SHOWS_MESSAGE)
 )
 def book_show(show_name=None, date=None, time=None, location=None) -> str | None:
-    if not log_in(): return LOG_IN_FAILURE
+    if not log_in():
+        raise AuthenticationError(LOG_IN_FAILURE)
     
     logger.info("Enter book show function")
     conn = sqlite3.connect(booking.db_path)

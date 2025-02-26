@@ -1,3 +1,4 @@
+from arklex.env.exceptions import AuthenticationError
 from ..tools import register_tool, logger
 import ast
 import hubspot
@@ -46,7 +47,7 @@ def create_ticket(contact_information: str, issue: str, **kwargs) -> str:
     contact_information = ast.literal_eval(contact_information)
     contact_id = contact_information.get('id')
     if not access_token:
-        return HUBSPOT_AUTH_ERROR
+        raise AuthenticationError(HUBSPOT_AUTH_ERROR)
 
     api_client = hubspot.Client.create(access_token=access_token)
 

@@ -3,6 +3,7 @@ from typing import Any, Dict
 
 import shopify
 
+from arklex.env.exceptions import AuthenticationError, DataNotFoundError
 from arklex.env.tools.tools import register_tool
 from arklex.env.tools.shopify.utils import SHOPIFY_AUTH_ERROR
 
@@ -45,7 +46,7 @@ def get_order_details(order_ids: list, limit=10, **kwargs) -> str:
     token = kwargs.get("token")
 
     if not shop_url or not api_version or not token:
-        return SHOPIFY_AUTH_ERROR
+        raise AuthenticationError(SHOPIFY_AUTH_ERROR)
     
     try:
         with shopify.Session.temp(shop_url, api_version, token):
@@ -83,4 +84,4 @@ def get_order_details(order_ids: list, limit=10, **kwargs) -> str:
             results.append(json.dumps(parsed_response))
         return json.dumps(results)
     except Exception as e:
-        return ORDERS_NOT_FOUND
+        raise DataNotFoundError(ORDERS_NOT_FOUND)

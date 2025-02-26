@@ -11,6 +11,7 @@ Module Name: cart_remove_itmes
 
 This file contains the code for removing items in a shopping cart.
 """
+from arklex.env.exceptions import FunctionFailureError
 from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
 from arklex.env.tools.shopify.utils_cart import *
 from arklex.env.tools.shopify.utils_nav import *
@@ -46,4 +47,4 @@ def cart_remove_items(cart_id, line_ids):
         make_query(cart_url, query, variable, cart_headers)
         return
     except:
-        return CART_REMOVE_ITEM_ERROR
+        raise FunctionFailureError(CART_REMOVE_ITEM_ERROR)

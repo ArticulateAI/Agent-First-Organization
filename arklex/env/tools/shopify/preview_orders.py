@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from arklex.env.exceptions import FunctionFailureError, PermissionDeniedError
 from arklex.env.tools.tools import register_tool
 
 # general GraphQL navigation utilities
@@ -71,10 +72,10 @@ def preview_orders(refresh_token: str, **kwargs) -> str:
         try:
             response = make_query(customer_url, body, {}, customer_headers | auth)['data']['customer']['orders']
         except Exception as e:
-            return f"error: {e}"
+            raise FunctionFailureError(f"error: {e}")
         
         pageInfo = response['pageInfo']
         return response['nodes'], pageInfo
         
     except Exception:
-        raise PermissionError 
+        raise PermissionDeniedError()

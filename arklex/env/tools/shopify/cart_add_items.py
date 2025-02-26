@@ -11,6 +11,7 @@ Module Name: cart_add_items
 
 This file contains the code for adding items to a shopping cart.
 """
+from arklex.env.exceptions import FunctionFailureError
 from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
 from arklex.env.tools.shopify.utils_cart import *
 from arklex.env.tools.shopify.utils_nav import *
@@ -50,4 +51,4 @@ def cart_add_items(cart_id, items: list[tuple]):
         make_query(cart_url, query, variable, cart_headers)
         return
     except:
-        return CART_ADD_ITEM_ERROR
+        raise FunctionFailureError(CART_ADD_ITEM_ERROR)

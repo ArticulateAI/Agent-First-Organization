@@ -1,6 +1,7 @@
 from typing import Any, Dict
 import json
 
+from arklex.env.exceptions import DataNotFoundError
 from arklex.env.tools.tools import register_tool
 
 from arklex.env.tools.shopify.utils_slots import ShopifySlots, ShopifyOutputs
@@ -80,4 +81,4 @@ def get_user_details_admin(user_id: str, **kwargs) -> str:
             return data, pageInfo
 
     except Exception:
-        return USER_NOT_FOUND_ERROR
+        raise DataNotFoundError(USER_NOT_FOUND_ERROR)
