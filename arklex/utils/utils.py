@@ -114,7 +114,7 @@ def format_chat_history(chat_history):
 def format_messages_by_provider(messages, text, model=MODEL):
     llm_provider = model['llm_provider']
     if llm_provider == "anthropic":
-        return {"system": messages[0]['content']}
+        return {"messages": [{"role": "user", "content": f"{messages[0]['content']}"}]}
     elif llm_provider == 'gemini':
         messages.append({"role": "user", "content": f"{text}"})
     return {"messages": messages}

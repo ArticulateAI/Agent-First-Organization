@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
@@ -54,6 +55,9 @@ class NLUModelAPI ():
                     temperature = 0.7,
                 )
             response = res.choices[0].message.content
+            if model['llm_provider'] == 'anthropic':
+                    response_data = json.loads(response)
+                    response = response_data.get('intent', '')
         
         logger.info(f"response for {debug_text} is \n{response}")
         return response
