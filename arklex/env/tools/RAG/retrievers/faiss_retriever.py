@@ -52,7 +52,7 @@ class FaissRetrieverExecutor:
     def _init_retriever(self, **kwargs):
         # initiate FAISS retriever
         embedding_model = PROVIDER_EMBEDDINGS.get(MODEL['llm_provider'], OpenAIEmbeddings)(
-            model=self.embedding_model_name
+            **{ 'model': self.embedding_model_name } if MODEL['llm_provider'] != 'anthropic' else { 'model_name': self.embedding_model_name }
         )
         docsearch = FAISS.from_documents(self.texts, embedding_model)
         retriever = docsearch.as_retriever(**kwargs)
