@@ -1,0 +1,180 @@
+{
+    "nodes": [
+        [
+            "0",
+            {
+                "resource": {
+                    "id": "9aa47724-0b77-4752-9528-cf4d06a46f15",
+                    "name": "MessageWorker"
+                },
+                "attribute": {
+                    "value": "Hello! Welcome to our store! How can I help you today?",
+                    "task": "start message",
+                    "directed": false
+                },
+                "limit": 1,
+                "type": "start"
+            }
+        ],
+        [
+            "1",
+            {
+                "resource": {
+                    "id": "9aa47724-0b77-4752-9528-cf4d06a46915",
+                    "name": "HITLWorkerChatFlag"
+                },
+                "attribute": {
+                    "value": "",
+                    "task": "chat with human",
+                    "directed": false
+                },
+                "limit": 10,
+                "type": "human"
+            }
+        ],
+        [
+            "2",
+            {
+                "resource": {
+                    "id": "9aa47724-0b77-4752-9528-cf4b06a4e915",
+                    "name": "HITLWorkerMCFlag"
+                },
+                "attribute": {
+                    "value": "",
+                    "task": "Confirm transaction with human",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "3",
+            {
+                "resource": {
+                    "id": "12347724-0b77-4752-9528-cf4b06a46915",
+                    "name": "FaissRAGWorker"
+                },
+                "attribute": {
+                    "value": "",
+                    "task": "Answer user's question about general customer service",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ],
+        [
+            "4",
+            {
+                "resource": {
+                    "id": "9aa47724-0b77-4752-9528-cf4d06a46f15",
+                    "name": "MessageWorker"
+                },
+                "attribute": {
+                    "value": "",
+                    "task": "",
+                    "directed": false
+                },
+                "limit": 1
+            }
+        ]
+    ],
+    "edges": [
+        [
+            "0",
+            "1",
+            {
+                "intent": "User want to talk to real human",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "2",
+            {
+                "intent": "User want to test confirmation",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "0",
+            "3",
+            {
+                "intent": "User has question about general products information",
+                "attribute": {
+                    "weight": 1,
+                    "pred": true,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ],
+        [
+            "2",
+            "4",
+            {
+                "intent": "none",
+                "attribute": {
+                    "weight": 1,
+                    "pred": false,
+                    "definition": "",
+                    "sample_utterances": []
+                }
+            }
+        ]
+    ],
+    "role": "customer service assistant",
+    "user_objective": "The customer service assistant helps users with customer service inquiries. It can provide information about products, services, and policies, as well as help users resolve issues and complete transactions.",
+    "builder_objective": "The customer service assistant helps to request customer's contact information.",
+    "domain": "robotics and automation",
+    "intro": "Richtech Robotics's headquarter is in Las Vegas; the other office is in Austin. Richtech Robotics provide worker robots (ADAM, ARM, ACE), delivery robots (Matradee, Matradee X, Matradee L, Richie), cleaning robots (DUST-E SX, DUST-E MX) and multipurpose robots (skylark). Their products are intended for business purposes, but not for home purpose; the ADAM robot is available for purchase and rental for multiple purposes. This robot bartender makes tea, coffee and cocktails. Richtech Robotics also operate the world's first robot milk tea shop, ClouTea, in Las Vegas (www.cloutea.com), where all milk tea beverages are prepared by the ADAM robot. The delivery time will be one month for the delivery robot, 2 weeks for standard ADAM, and two months for commercial cleaning robot. ",
+    "task_docs": [
+        {
+            "source": "https://www.richtechrobotics.com/",
+            "num": 20
+        }
+    ],
+    "rag_docs": [
+        {
+            "source": "https://www.richtechrobotics.com/",
+            "num": 20
+        }
+    ],
+    "tasks": [],
+    "tools": [],
+    "workers": [
+        {
+            "id": "9aa47724-0b77-4752-9528-cf4d06a46f15",
+            "name": "MessageWorker",
+            "path": "message_worker.py"
+        },
+        {
+            "id": "9aa47724-0b77-4752-9528-cf4d06a46915",
+            "name": "HITLWorkerChatFlag",
+            "path": "hitl_worker.py",
+            "fixed_args": {}
+        },
+        {
+            "id": "9aa47724-0b77-4752-9528-cf4b06a4e915",
+            "name": "HITLWorkerMCFlag",
+            "path": "hitl_worker.py",
+            "fixed_args": {}
+        },
+        {
+            "id": "12347724-0b77-4752-9528-cf4b06a46915",
+            "name": "FaissRAGWorker",
+            "path": "faiss_rag_worker.py"
+        }
+    ],
+    "nluapi": "",
+    "slotfillapi": ""
+}

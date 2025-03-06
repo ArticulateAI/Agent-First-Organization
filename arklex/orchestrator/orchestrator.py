@@ -35,7 +35,6 @@ from arklex.env.planner.function_calling import aimessage_to_dict
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-
 class AgentOrg:
     def __init__(self, config, env: Env, **kwargs):
         if isinstance(config, dict):
@@ -165,7 +164,6 @@ class AgentOrg:
             version=self.product_kwargs.get("version", "default"),
             language=self.product_kwargs.get("language", "EN"),
             bot_type=self.product_kwargs.get("bot_type", "presalebot"),
-            available_workers=self.product_kwargs.get("workers", [])
         )
         message_state = MessageState(
             sys_instruct=sys_instruct, 
@@ -183,6 +181,7 @@ class AgentOrg:
         response_state, params = self.env.step(node_info["id"], message_state, params)
         
         logger.info(f"{response_state=}")
+        logger.info(f"{params=}")
 
         tool_response = params.get("metadata", {}).get("tool_response", {})
         params["metadata"]["tool_response"] = {}
@@ -302,7 +301,8 @@ class AgentOrg:
         params["tool_response"] = tool_response
         output = {
             "answer": response,
-            "parameters": params
+            "parameters": params,
+            "human-in-the-loop": params['metadata'].get('hitl', None),
         }
 
         with ls.trace(name=TraceRunName.OrchestResponse) as rt:

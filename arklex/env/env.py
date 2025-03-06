@@ -3,8 +3,10 @@ import logging
 import uuid
 import importlib
 from typing import Optional
+from functools import partial
 
 from arklex.env.tools.tools import Tool
+from arklex.env.workers.worker import BaseWorker
 from arklex.env.planner.function_calling import FunctionCallingPlanner
 from arklex.utils.graph_state import StatusEnum
 from arklex.orchestrator.NLU.nlu import SlotFilling
@@ -63,8 +65,8 @@ class DefaulResourceInitializer(BaseResourceInitializer):
                 continue
             worker_registry[worker_id] = {
                 "name": name,
-                "description": func().description,
-                "execute": func
+                "description": func.description,
+                "execute": partial(func, **worker.get("fixed_args", {}))
             }
         return worker_registry
 
@@ -89,6 +91,7 @@ class Env():
         if id in self.tools:
             logger.info(f"{self.tools[id]['name']} tool selected")
             tool: Tool = self.tools[id]["execute"]()
+            # slotfilling is in the basetoool class
             tool.init_slotfilling(self.slotfillapi)
             response_state = tool.execute(message_state, **self.tools[id]["fixed_args"])
             params["history"] = response_state.get("trajectory", [])
@@ -99,16 +102,20 @@ class Env():
         elif id in self.workers:
             message_state["metadata"]["worker"] = self.workers
             logger.info(f"{self.workers[id]['name']} worker selected")
-            worker = self.workers[id]["execute"]()
+            worker: BaseWorker = self.workers[id]["execute"]()
+            # If the worker need to do the slotfilling, then it should have this method
+            if hasattr(worker, "init_slotfilling"):
+                worker.init_slotfilling(self.slotfillapi)
             response_state = worker.execute(message_state)
             call_id = str(uuid.uuid4())
             params["history"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': "{}", 'name': self.id2name[id]}, 'id': call_id, 'type': 'function'}], 'function_call': None})
             params["history"].append({
-                        "role": "tool",
-                        "tool_call_id": call_id,
-                        "name": self.id2name[id],
-                        "content": response_state["response"]
+                "role": "tool",
+                "tool_call_id": call_id,
+                "name": self.id2name[id],
+                "content": response_state["response"] if "response" in response_state else response_state["message_flow"],
             })
+            params["node_status"][params.get("curr_node")] = response_state.get("status", StatusEnum.COMPLETE.value)
         else:
             logger.info("planner selected")
             action, response_state, msg_history = self.planner.execute(message_state, params["history"])

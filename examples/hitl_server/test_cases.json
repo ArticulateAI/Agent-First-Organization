@@ -1,0 +1,84 @@
+[
+    {
+        "test_id": 0,
+        "user_utterance": [
+            "I want to talk to human!",
+            "I want to know more about your product: Adam!"
+        ],
+        "description": "The user wants to talk to a human, then it should activate the human-in-the-loop worker. Skip the middle conversation between human and user, the next user utterance is delivered to agent again and answered by RAG worker.",
+        "criteria": "After the first turn, the bot response key 'human-in-the-loop' should be return 'live'.",
+        "final_state": ["live", ""],
+        "trajectory": ["1", "3"],
+        "expected_conversation": [
+            {
+                "role": "assistant",
+                "content": "Hello! Welcome to our store. How can I assist you today?"
+            },
+            {
+                "role": "user",
+                "content": "I want to book a demo!"
+            },
+            {
+                "role": "assistant",
+                "content": "To book a demo, could you please provide your email address? This will help us set up the meeting for you."
+            },
+            {
+                "role": "user",
+                "content": "yl4021@columbia.edu"
+            },
+            {
+                "role": "assistant",
+                "content": "Could you please provide the time when you will be available for the meeting? This will help us schedule your demo at a convenient time for you."
+            },
+            {
+                "role": "user",
+                "content": "Tmr"
+            },
+            {
+                "role": "assistant",
+                "content": "Could you please provide the exact date and time for the meeting? This will help us schedule your demo accurately. Thank you!"
+            },
+            {
+                "role": "user",
+                "content": "Anytime between 2 - 4pm"
+            },
+            {
+                "role": "assistant",
+                "content": "Thank you for providing the time range. To ensure we schedule the demo at a time that suits you best, would you like the meeting to start at 2:00 PM, or is there another specific time within 2:00 PM to 4:00 PM that you prefer?"
+            },
+            {
+                "role": "user",
+                "content": "New York"
+            },
+            {
+                "role": "assistant",
+                "content": "Your demo has been successfully scheduled for tomorrow, February 4th, at 2:00 PM (New York time). You will receive an invitation at your email address: yl4021@columbia.edu. \n\nIf you have any further questions or need to make changes, feel free to let me know!"
+            }
+        ]
+    },
+    {
+        "test_id": 1,
+        "user_utterance": [
+            "I want to know more about your product: Adam!",
+            "I want to talk to human!"
+        ],
+        "description": "Ask some question that can be answered by RAG, then ask to talk to human.",
+        "criteria": "",
+        "final_state": ["", "live"],
+        "trajectory": ["3", "1"],
+        "expected_conversation": [
+            {
+                "role": "assistant",
+                "content": "Hello! Welcome to our store. How can I assist you today?"
+            },
+            {
+                "role": "user",
+                "content": "I want to book a demo for my email yl4021@columbia.edu at Tmr 2pm in New York time!"
+            },
+            {
+                "role": "assistant",
+                "content": "Your demo has been successfully scheduled for tomorrow, February 4th, at 2:00 PM (New York time). You will receive an invitation at your email address: yl4021@columbia.edu. \n\nIf you have any further questions or need to make changes, feel free to let me know!"
+            }
+        ]
+    }
+]

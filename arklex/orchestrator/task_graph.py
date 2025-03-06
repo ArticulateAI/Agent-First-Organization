@@ -221,6 +221,18 @@ class TaskGraph(TaskGraphBase):
             curr_node = str(curr_node)
         logger.info(f"Intial curr_node: {curr_node}")
 
+        node_status = params.get("node_status", {})
+        logger.info(f"node_status: {node_status}")
+
+        # For the human-in-the-loop type of node, if the node is not completed, then directly return that node instead of jumping to other nodes
+        status = node_status.get(curr_node, StatusEnum.COMPLETE.value)
+        if self.graph.nodes[curr_node].get("type") and self.graph.nodes[curr_node]["type"] == "human" and status == StatusEnum.INCOMPLETE.value:
+            node_info = self.graph.nodes[curr_node]
+            node_name = node_info["resource"]["name"]
+            id = node_info["resource"]["id"]
+            node_info = {"id": id, "name": node_name, "attribute": node_info["attribute"]}
+            return node_info, params
+
         # get the current global intent
         curr_pred_intent = params.get("curr_pred_intent", None)
 
@@ -304,7 +316,8 @@ class TaskGraph(TaskGraphBase):
                 logger.info(f"curr_node: {next_node}")
                 node_info, params, candidates_intents = \
                 self._get_node(next_node, available_nodes, available_intents, params, intent=next_intent)
-                if next_node != curr_node:
+                 # if current node is not a leaf node and jump to another node, then add it onto stack
+                if next_node != curr_node and list(self.graph.successors(curr_node)):
                     flow_stack.append(curr_node)
                     params["flow"] = flow_stack
                 if node_info["name"]:
@@ -315,7 +328,6 @@ class TaskGraph(TaskGraphBase):
                 # 1. no global intent found and no local intent found
                 # 2. gload intent found but skipped based on the _get_node function
                 # Then check whether the current node completed or not
-                node_status = params.get("node_status", {})
                 status = node_status.get(curr_node, StatusEnum.COMPLETE.value)
                 if status == StatusEnum.INCOMPLETE.value:
                     logger.info(f"no local or global intent found, the current node is not complete")
