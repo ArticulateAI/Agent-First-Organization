@@ -10,6 +10,7 @@ from arklex.utils.utils import chunk_string
 from arklex.utils.graph_state import MessageState
 from arklex.utils.model_config import MODEL
 from arklex.utils.model_provider_config import PROVIDER_MAP
+from arklex.orchestrator.prompts import PLANNER_SELECTION_PROMPT
 
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,30 @@ class DefaultWorker(BaseWorker):
     
     def execute(self, msg_state: MessageState):
         worker_id = self._choose_worker(msg_state)
-        worker = self.available_workers[worker_id]["execute"]()
-        result = worker.execute(msg_state)
-        return result
+        logger.info(f"DefaultWorker base worker selected: {self.available_workers[worker_id]}")
+
+        # Hierarchical selection process for determining whether worker selected by DefaultWorker is sufficient,
+        # or if FunctionCallingPlanner must be invoked instead
+        sys_prompt = PLANNER_SELECTION_PROMPT
+        available_workers = {id: resource for id, resource in msg_state["metadata"]["worker"].items() if resource["name"] != "DefaultWorker"}
+        worker_info_str = f"Worker name: {available_workers[worker_id]['name']}\nDescription: {available_workers[worker_id]['description']}"
+        prompt = PromptTemplate.from_template(sys_prompt)
+        input_prompt = prompt.invoke({"chat_history_str": msg_state["user_message"].history, "candidate_worker_info": worker_info_str})
+        chunked_prompt = chunk_string(input_prompt.text, tokenizer=MODEL["tokenizer"], max_length=MODEL["context"])
+        final_chain = self.llm | StrOutputParser()
+        answer = final_chain.invoke(chunked_prompt)
+
+        # logger.info(f"Planner selection: System prompt: {input_prompt.text}\nResponse: {answer}")
+
+        # If answer is "no", return response indicating FunctionCallingPlanner should be invoked in
+        # en.step(); otherwise invoke worker originally selected by DefaultWorker and return its response
+        if answer.strip().lower() == "no":
+            logger.info("Selected planner in DefaultWorker.execute()...")
+            msg_state["planner_selected"] = True
+            return msg_state
+        else:
+            worker = self.available_workers[worker_id]["execute"]()
+            result = worker.execute(msg_state)
+            logger.info(f"msg_state in DefaultWorker after worker.execute(): {msg_state}")
+            logger.info(f"Result from worker.execute() in DefaultWorker: {result}")
+            return result

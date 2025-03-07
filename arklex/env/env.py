@@ -101,14 +101,22 @@ class Env():
             logger.info(f"{self.workers[id]['name']} worker selected")
             worker = self.workers[id]["execute"]()
             response_state = worker.execute(message_state)
-            call_id = str(uuid.uuid4())
-            params["history"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': "{}", 'name': self.id2name[id]}, 'id': call_id, 'type': 'function'}], 'function_call': None})
-            params["history"].append({
-                        "role": "tool",
-                        "tool_call_id": call_id,
-                        "name": self.id2name[id],
-                        "content": response_state["response"]
-            })
+
+            # If message_state contains "planner_selected": True, remove this key and then invoke FunctionCallingPlanner;
+            # otherwise, DefaultWorker selected and invoked candidate worker instead of planner, so continue as normal
+            if response_state.pop("planner_selected", False): # Remove this flag if present in response_state
+                logger.info("FunctionCallingPlanner selected by DefaultWorker")
+                action, response_state, msg_history = self.planner.execute(message_state, params["history"])
+            else:
+                call_id = str(uuid.uuid4())
+                params["history"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': "", 'name': self.id2name[id]}, 'id': call_id, 'type': 'function'}], 'function_call': None})
+                params["history"].append({
+                            "role": "tool",
+                            "tool_call_id": call_id,
+                            "name": self.id2name[id],
+                            "content": response_state["response"]
+                })
+
         else:
             logger.info("planner selected")
             action, response_state, msg_history = self.planner.execute(message_state, params["history"])

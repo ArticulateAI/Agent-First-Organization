@@ -24,3 +24,15 @@ Make the decision based on the current task, conversation record, and available 
 
 Thought:
 """
+
+PLANNER_SELECTION_PROMPT = """
+Given the conversation history and the proposed worker, your job is to determine whether or not the proposed worker is suitable for satisfying the user's request. Reply with 'yes' if and only if the proposed worker is suitable for solving the request. Otherwise, reply with 'no' if the proposed worker is not sufficient (for instance, if a set of tools is required for satisfying the request).
+
+Conversation history:
+{chat_history_str} 
+
+Proposed worker info:
+{candidate_worker_info} 
+
+Answer:
+"""
