@@ -1,4 +1,5 @@
 import logging
+import inspect
 
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
@@ -53,7 +54,7 @@ class ToolGenerator():
         answer = final_chain.invoke(chunked_prompt)
         state["message_flow"] = ""
         state["response"] = answer
-
+        state = trace(input=answer, state=state)
         return state
     
     @staticmethod
@@ -80,7 +81,7 @@ class ToolGenerator():
 
         state["message_flow"] = ""
         state["response"] = answer
-
+        state = trace(input=answer, state=state)
         return state
     
     @staticmethod
@@ -102,3 +103,14 @@ class ToolGenerator():
 
         state["response"] = answer
         return state
+
+def trace(input, state):
+    current_frame = inspect.currentframe()
+    previous_frame = current_frame.f_back if current_frame else None
+    previous_function_name = previous_frame.f_code.co_name if previous_frame else "unknown"
+    response_meta = {previous_function_name: input}
+    if state["metadata"].get("tool_response"):
+        state["metadata"]["tool_response"].append(response_meta)
+    else:
+        state["metadata"]["tool_response"] = [response_meta]
+    return state

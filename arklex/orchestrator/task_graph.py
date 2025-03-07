@@ -163,7 +163,7 @@ class TaskGraph(TaskGraphBase):
         skip = self._check_skip(node_info)
         logger.info(f"skip current node {sample_node}: {skip}")
         if skip: # continue check the candidate intents under this node
-            node_info = {"id": None, "name": None, "attribute": None}
+            node_info = {"id": None, "name": None, "attribute": None, "node_id": sample_node}
             for u, v, data in self.graph.out_edges(sample_node, data=True):
                 intent = data.get("intent")
                 if intent != "none" and data.get("intent") and available_nodes[v]["limit"] >= 1:
@@ -172,7 +172,7 @@ class TaskGraph(TaskGraphBase):
                     edge_info["target_node"] = v
                     candidates_intents[intent].append(edge_info)
         else: # return the node info
-            node_info = {"id": id, "name": node_name, "attribute": node_info["attribute"]}
+            node_info = {"id": id, "name": node_name, "attribute": node_info["attribute"], "node_id": sample_node}
         
         return node_info, params, candidates_intents
 
@@ -206,11 +206,11 @@ class TaskGraph(TaskGraphBase):
             return False
         return True
             
-    def get_node(self, inputs):
+    def get_node(self, inputs, same_turn=False):
         self.text = inputs["text"]
         self.chat_history_str = inputs["chat_history_str"]
         params = inputs["parameters"]
-        nlu_records = []
+        nlu_records = params.get("nlu_records", [])
 
         # get the current node
         curr_node = params.get("curr_node", None)
@@ -272,45 +272,46 @@ class TaskGraph(TaskGraphBase):
             # if there is no intents available in the whole graph except unsure_intent
             # Then there is no need to predict the intent
             # Direct move to the next node
-            if len(available_intents) == 1 and self.unsure_intent.get("intent") in available_intents.keys():
-                pred_intent = self.unsure_intent.get("intent")
-            else: # global intent prediction
-                # Another checking to make sure the user indeed want to switch the current task
-                if not self._switch_pred_intent(curr_pred_intent, available_intents):
-                    logger.info(f"User doesn't want to switch the current task: {curr_pred_intent}")
+            if not same_turn:
+                if len(available_intents) == 1 and self.unsure_intent.get("intent") in available_intents.keys():
                     pred_intent = self.unsure_intent.get("intent")
-                else:
-                    logger.info(f"User wants to switch the current task: {curr_pred_intent}")
-                    global_intent_checked = True
-                    # check other intent
-                    # if match other intent, add flow, jump over
-                    if self.unsure_intent.get("intent") in available_intents.keys():
-                        available_intents_w_unsure = copy.deepcopy(available_intents)
+                else: # global intent prediction
+                    # Another checking to make sure the user indeed want to switch the current task
+                    if not self._switch_pred_intent(curr_pred_intent, available_intents):
+                        logger.info(f"User doesn't want to switch the current task: {curr_pred_intent}")
+                        pred_intent = self.unsure_intent.get("intent")
                     else:
-                        available_intents_w_unsure = copy.deepcopy(available_intents)
-                        available_intents_w_unsure[self.unsure_intent.get("intent")].append(self.unsure_intent)
-                    logger.info(f"available_intents_w_unsure: {available_intents_w_unsure}")
-                    
-                    pred_intent = self.nluapi.execute(self.text, available_intents_w_unsure, self.chat_history_str, params.get("metadata", {}))
-                    nlu_records.append({"candidate_intents": available_intents_w_unsure, 
-                                        "pred_intent": pred_intent, "no_intent": False, "global_intent": True})
-                    params["nlu_records"] = nlu_records
-                    found_pred_in_avil, pred_intent, intent_idx = self._postprocess_intent(pred_intent, available_intents)
-            if pred_intent.lower() != self.unsure_intent.get("intent") and found_pred_in_avil:  # found global intent
-                logger.info(f"Global intent changed from {curr_pred_intent} to {pred_intent}")
-                curr_pred_intent = pred_intent
-                params["curr_pred_intent"] = curr_pred_intent
-                next_node, next_intent = self.jump_to_node(pred_intent, intent_idx, available_nodes, curr_node)
-                logger.info(f"curr_node: {next_node}")
-                node_info, params, candidates_intents = \
-                self._get_node(next_node, available_nodes, available_intents, params, intent=next_intent)
-                if next_node != curr_node:
-                    flow_stack.append(curr_node)
-                    params["flow"] = flow_stack
-                if node_info["name"]:
-                    return node_info, params
-                curr_node = params["curr_node"]
-                available_nodes = params["available_nodes"]
+                        logger.info(f"User wants to switch the current task: {curr_pred_intent}")
+                        global_intent_checked = True
+                        # check other intent
+                        # if match other intent, add flow, jump over
+                        if self.unsure_intent.get("intent") in available_intents.keys():
+                            available_intents_w_unsure = copy.deepcopy(available_intents)
+                        else:
+                            available_intents_w_unsure = copy.deepcopy(available_intents)
+                            available_intents_w_unsure[self.unsure_intent.get("intent")].append(self.unsure_intent)
+                        logger.info(f"available_intents_w_unsure: {available_intents_w_unsure}")
+                        
+                        pred_intent = self.nluapi.execute(self.text, available_intents_w_unsure, self.chat_history_str, params.get("metadata", {}))
+                        nlu_records.append({"candidate_intents": available_intents_w_unsure, 
+                                            "pred_intent": pred_intent, "no_intent": False, "global_intent": True})
+                        params["nlu_records"] = nlu_records
+                        found_pred_in_avil, pred_intent, intent_idx = self._postprocess_intent(pred_intent, available_intents)
+                if pred_intent.lower() != self.unsure_intent.get("intent") and found_pred_in_avil:  # found global intent
+                    logger.info(f"Global intent changed from {curr_pred_intent} to {pred_intent}")
+                    curr_pred_intent = pred_intent
+                    params["curr_pred_intent"] = curr_pred_intent
+                    next_node, next_intent = self.jump_to_node(pred_intent, intent_idx, available_nodes, curr_node)
+                    logger.info(f"curr_node: {next_node}")
+                    node_info, params, candidates_intents = \
+                    self._get_node(next_node, available_nodes, available_intents, params, intent=next_intent)
+                    if next_node != curr_node:
+                        flow_stack.append(curr_node)
+                        params["flow"] = flow_stack
+                    if node_info["name"]:
+                        return node_info, params
+                    curr_node = params["curr_node"]
+                    available_nodes = params["available_nodes"]
             while not candidates_intents:  
                 # 1. no global intent found and no local intent found
                 # 2. gload intent found but skipped based on the _get_node function
@@ -319,7 +320,12 @@ class TaskGraph(TaskGraphBase):
                 status = node_status.get(curr_node, StatusEnum.COMPLETE.value)
                 if status == StatusEnum.INCOMPLETE.value:
                     logger.info(f"no local or global intent found, the current node is not complete")
-                    node_info = {"id": self.graph.nodes[curr_node]["resource"]["id"], "name": self.graph.nodes[curr_node]["resource"]["name"], "attribute": self.graph.nodes[curr_node]["attribute"]}
+                    node_info = {
+                        "id": self.graph.nodes[curr_node]["resource"]["id"], 
+                        "name": self.graph.nodes[curr_node]["resource"]["name"], 
+                        "attribute": self.graph.nodes[curr_node]["attribute"],
+                        "node_id": curr_node
+                    }
                     return node_info, params
                 # If completed, then move to the next connected node(s) (randomly choose one of them if there are multiple "None" intent connected)
                 logger.info(f"no local or global intent found, move to the next connected node(s)")
@@ -331,10 +337,11 @@ class TaskGraph(TaskGraphBase):
 
                 node_info, params, candidates_intents = \
                 self._get_node(next_node, available_nodes, available_intents, params)
-                if params.get("nlu_records", None):
-                    params["nlu_records"][-1]["no_intent"] = True  # move on to the next node
-                else: # only others available
-                    params["nlu_records"] = [{"candidate_intents": [], "pred_intent": "", "no_intent": True, "global_intent": False}]
+                if not same_turn:
+                    if params.get("nlu_records", None):
+                        params["nlu_records"][-1]["no_intent"] = True  # move on to the next node
+                    else: # only others available
+                        params["nlu_records"] = [{"candidate_intents": [], "pred_intent": "", "no_intent": True, "global_intent": False}]
                 
                 if node_info["name"]:
                     return node_info, params
@@ -351,7 +358,12 @@ class TaskGraph(TaskGraphBase):
         node_status = params.get("node_status", {})
         status = node_status.get(curr_node, StatusEnum.COMPLETE.value)
         if status == StatusEnum.INCOMPLETE.value:
-            node_info = {"id": self.graph.nodes[curr_node]["resource"]["id"], "name": self.graph.nodes[curr_node]["resource"]["name"], "attribute": self.graph.nodes[curr_node]["attribute"]}
+            node_info = {
+                "id": self.graph.nodes[curr_node]["resource"]["id"], 
+                "name": self.graph.nodes[curr_node]["resource"]["name"], 
+                "attribute": self.graph.nodes[curr_node]["attribute"],
+                "node_id": curr_node
+            }
             return node_info, params
 
         while candidates_intents:  # local intent prediction
@@ -457,13 +469,14 @@ class TaskGraph(TaskGraphBase):
             else: # neither local nor global intent found
                 break
         # if none of the available intents can represent user's utterance, transfer to the DefaultWorker to let it decide for the next step
-        if nlu_records:
-            nlu_records[-1]["no_intent"] = True  # no intent found
-        else: # didn't do prediction at all for the current turn
-            nlu_records.append({"candidate_intents": [], "pred_intent": "", "no_intent": True, "global_intent": False})
-        params["nlu_records"] = nlu_records
+        if not same_turn:
+            if nlu_records:
+                nlu_records[-1]["no_intent"] = True  # no intent found
+            else: # didn't do prediction at all for the current turn
+                nlu_records.append({"candidate_intents": [], "pred_intent": "", "no_intent": True, "global_intent": False})
+            params["nlu_records"] = nlu_records
         params["curr_node"] = curr_node
-        node_info = {"id": "DefaultWorker", "name": "DefaultWorker", "attribute": {"value": "", "direct": False}}
+        node_info = {"id": "DefaultWorker", "name": "DefaultWorker", "attribute": {"value": "", "direct": False}, "node_id": None}
         
         return node_info, params
 

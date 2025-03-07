@@ -6,7 +6,7 @@ from typing import List, Optional, Dict, Any
 
 from benchmark.tau_bench.agents.base import Agent
 from benchmark.tau_bench.envs.base import Env
-from benchmark.tau_bench.types import SolveResult, Action, RESPOND_ACTION_NAME
+from benchmark.tau_bench.tau_types import SolveResult, Action, RESPOND_ACTION_NAME
 
 
 class ToolCallingAgent(Agent):

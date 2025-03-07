@@ -3,7 +3,7 @@
 import abc
 from typing import Optional
 from benchmark.tau_bench.envs.base import Env
-from benchmark.tau_bench.types import SolveResult
+from benchmark.tau_bench.tau_types import SolveResult
 
 
 class Agent(abc.ABC):

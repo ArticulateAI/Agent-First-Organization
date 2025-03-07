@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from benchmark.tau_bench.envs import get_env
 from benchmark.tau_bench.agents.base import Agent
-from benchmark.tau_bench.types import EnvRunResult, RunConfig
+from benchmark.tau_bench.tau_types import EnvRunResult, RunConfig
 from litellm import provider_list
 from benchmark.tau_bench.envs.user import UserStrategy
 

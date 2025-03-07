@@ -5,6 +5,7 @@ import importlib
 from typing import Optional
 
 from arklex.env.tools.tools import Tool
+from arklex.env.workers.worker import BaseWorker
 from arklex.env.planner.function_calling import FunctionCallingPlanner
 from arklex.utils.graph_state import StatusEnum
 from arklex.orchestrator.NLU.nlu import SlotFilling
@@ -99,8 +100,9 @@ class Env():
         elif id in self.workers:
             message_state["metadata"]["worker"] = self.workers
             logger.info(f"{self.workers[id]['name']} worker selected")
-            worker = self.workers[id]["execute"]()
+            worker: BaseWorker = self.workers[id]["execute"]()
             response_state = worker.execute(message_state)
+            response_state["metadata"]["tool_response"] = {f"{id}": response_state["metadata"]["tool_response"]}
             call_id = str(uuid.uuid4())
             params["history"].append({'content': None, 'role': 'assistant', 'tool_calls': [{'function': {'arguments': "{}", 'name': self.id2name[id]}, 'id': call_id, 'type': 'function'}], 'function_call': None})
             params["history"].append({

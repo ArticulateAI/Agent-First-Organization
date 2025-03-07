@@ -1,4 +1,4 @@
-from benchmark.tau_bench.types import Action, Task
+from benchmark.tau_bench.tau_types import Action, Task
 
 TASKS = [
     Task(

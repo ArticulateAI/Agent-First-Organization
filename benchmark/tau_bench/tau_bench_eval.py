@@ -23,15 +23,14 @@ from arklex.env.tools.tools import Tool
 
 from benchmark.tau_bench.envs.retail.tools import ALL_TOOLS
 from benchmark.tau_bench.envs import get_env
-from benchmark.tau_bench.types import RunConfig
+from benchmark.tau_bench.tau_types import RunConfig
 from benchmark.tau_bench.run import run
 from benchmark.tau_bench.envs.retail.data import load_data
 
 load_dotenv()
 
-API_PORT = "55135"
-NLUAPI_ADDR = f"http://localhost:{API_PORT}/nlu"
-SLOTFILLAPI_ADDR = f"http://localhost:{API_PORT}/slotfill"
+NLUAPI_ADDR = ""
+SLOTFILLAPI_ADDR = ""
 
 tool_name_class_map = {}
 
@@ -121,42 +120,6 @@ def generate_taskgraph(config_file, output_dir):
     with open(taskgraph_filepath, "w") as f:
         json.dump(task_graph, f, indent=4)
 
-
-
-nlu_process = None
-def terminate_subprocess():
-    """Terminate the FastAPI subprocess."""
-    global nlu_process
-    if nlu_process and nlu_process.poll() is None:  # Check if process is running
-        logger.info(f"Terminating FastAPI process with PID: {nlu_process.pid}")
-        nlu_process.terminate()  # Send SIGTERM
-        nlu_process.wait()  # Ensure it stops
-        logger.info("FastAPI process terminated.")
-
-
-atexit.register(terminate_subprocess)
-
-def start_apis():
-    """Start the FastAPI subprocess and update task graph API URLs."""
-    global nlu_process
-    command = [
-        "uvicorn",
-        "arklex.orchestrator.NLU.api:app",  # Replace with proper import path
-        "--port", API_PORT,
-        "--host", "0.0.0.0",
-        "--log-level", "warning"
-    ]
-
-    # Redirect FastAPI logs to a file
-    with open(os.path.join(root_dir, "logs", "api.log"), "w") as log_file:
-        nlu_process = subprocess.Popen(
-            command,
-            stdout=log_file,  # Redirect stdout to a log file
-            stderr=subprocess.STDOUT,  # Redirect stderr to the same file
-            start_new_session=True  # Run in a separate process group
-        )
-    logger.info(f"Started FastAPI process with PID: {nlu_process.pid}")
-
 def run_tau_bench_eval(
         taskgraph_dir,
         output_dir,
@@ -203,7 +166,7 @@ if __name__ == "__main__":
     parser.add_argument('--output-dir', type=str, default="./examples/tau_bench")
     parser.add_argument('--num-trials', type=int, default=1)
     parser.add_argument('--env', type=str, default="retail", choices=["retail"])
-    parser.add_argument('--task-ids', type=list, default=None)
+    parser.add_argument('--task-ids', type=list, default=[1,2,3,4,5,6,7,8,9,10])
 
     parser.add_argument('--model_api', type=str, default="http://127.0.0.1:8000/eval/chat")
     parser.add_argument('--model', type=str, default=MODEL["model_type_or_path"])
@@ -227,7 +190,6 @@ if __name__ == "__main__":
     # config_file = os.path.join(temp_output_dir, 'config.json')
     # generate_taskgraph(config_file, temp_output_dir)
 
-    start_apis()
     run_tau_bench_eval(
         taskgraph_dir=temp_output_dir,
         output_dir=eval_output_dir,

@@ -8,8 +8,14 @@ from dotenv import load_dotenv
 from arklex.utils.model_config import MODEL
 load_dotenv()
 
+try:
+    org_key = os.environ["OPENAI_ORG_ID"]
+except:
+    org_key = None
+
 client = OpenAI(
-    api_key=os.environ["OPENAI_API_KEY"]
+    api_key=os.environ["OPENAI_API_KEY"],
+    organization=org_key
 )
 
 def chatgpt_chatbot(messages, model=MODEL["model_type_or_path"]):

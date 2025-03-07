@@ -10,14 +10,14 @@ from arklex.env.env import Env
 
 # from benchmark.tau_bench.envs.base import Env
 from benchmark.tau_bench.agents.base import Agent
-from benchmark.tau_bench.types import SolveResult, Action, RESPOND_ACTION_NAME
+from benchmark.tau_bench.tau_types import SolveResult, Action, RESPOND_ACTION_NAME
 
 
 class AgentFirstOrg(Agent):
     def __init__(self, taskgraph_dir: str):
         self.taskgraph_dir = taskgraph_dir
         self.taskgraph_path = os.path.join(self.taskgraph_dir, "taskgraph.json")
-        from tau_bench_eval import TauBenchResourceInitializer
+        from benchmark.tau_bench.tau_bench_eval import TauBenchResourceInitializer
         with open(self.taskgraph_path) as taskgraph:
             taskgraph = json.load(taskgraph)
             tau_bench_resource_initializer = TauBenchResourceInitializer()

@@ -1,0 +1,21 @@
+{
+    "generic": {
+        "goal": ["order tracking", "asking for refund", "report order missing", "report product issue", "asking replacement", "request repair", "interested in product information", "product purchase", "product rental"],
+        "product_experience_level": ["new to this product", "used competitor product"],
+        "customer_type": ["new prospect", "returning customer"],
+        "persona": ["aggressive", "passive", "neutral"],
+        "current_webpage": ["home page", "product page", "about page"],
+        "modality": ["text"],
+        "communication_type": ["outgoing", "incoming"],
+        "discovery_type": ["social media", "friend recommendation", "search engine results", "third party website"],
+        "buying_behavior": ["economic", "quality oriented"]
+    },
+    "b2b": {
+        "decision_making_authority": ["primary", "secondary"],
+        "deal_stage": ["new leads", "demo schedule", "after demo", "decision make buy in", "contract sent", "contract signed", "money paid"]
+    },
+    "b2c": {
+        "brand_behavior": ["brand loyal", "brand indifferent"],
+        "purchasing_preference": ["discount oriented", "economic", "quality oriented"]
+    }
+}

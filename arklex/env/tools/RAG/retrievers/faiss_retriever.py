@@ -15,7 +15,7 @@ from arklex.utils.model_config import MODEL
 from arklex.env.prompts import load_prompts
 from arklex.utils.graph_state import MessageState
 from arklex.utils.model_provider_config import PROVIDER_MAP, PROVIDER_EMBEDDINGS, PROVIDER_EMBEDDING_MODELS
-
+from arklex.env.tools.utils import trace
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +28,10 @@ class RetrieveEngine():
         # Search for the relevant documents
         prompts = load_prompts(state["bot_config"])
         docs = FaissRetrieverExecutor.load_docs(database_path=os.environ.get("DATA_DIR"))
-        retrieved_text = docs.search(user_message.history, prompts["retrieve_contextualize_q_prompt"])
+        retrieved_text, retriever_returns = docs.search(user_message.history, prompts["retrieve_contextualize_q_prompt"])
 
         state["message_flow"] = retrieved_text
+        state = trace(input=retriever_returns, state=state)
         return state
 
 
@@ -72,9 +73,17 @@ class FaissRetrieverExecutor:
         logger.info(f"Reformulated input for retriever search: {ret_input}")
         docs_and_score = self.retrieve_w_score(ret_input)
         retrieved_text = ""
+        retriever_returns = []
         for doc, score in docs_and_score:
             retrieved_text += f"{doc.page_content} \n"
-        return retrieved_text
+            item = {
+                "title": doc.metadata.get("title"),
+                "content": doc.page_content,
+                "source": doc.metadata.get("source"),
+                "confidence": float(score),
+            }
+            retriever_returns.append(item)
+        return retrieved_text, retriever_returns
 
     @staticmethod
     def load_docs(database_path: str, embeddings: str=None, index_path: str="./index"):

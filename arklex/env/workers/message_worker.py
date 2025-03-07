@@ -8,6 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from arklex.env.workers.worker import BaseWorker, register_worker
 from arklex.env.prompts import load_prompts
+from arklex.env.tools.utils import trace
 from arklex.types import EventType
 from arklex.utils.utils import chunk_string
 from arklex.utils.graph_state import MessageState
@@ -59,6 +60,7 @@ class MessageWorker(BaseWorker):
 
         state["message_flow"] = ""
         state["response"] = answer
+        state = trace(input=answer, state=state)
         return state
     
     def choose_generator(self, state: MessageState):

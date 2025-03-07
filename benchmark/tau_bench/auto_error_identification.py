@@ -8,7 +8,7 @@ from benchmark.tau_bench.model_utils import default_api_from_args, API
 from benchmark.tau_bench.envs.airline.tasks_test import TASKS as AIRLINE_TASKS
 from benchmark.tau_bench.envs.retail.tasks_test import TASKS_TEST as RETAIL_TASKS
 from benchmark.tau_bench.model_utils.args import api_parser
-from benchmark.tau_bench.types import Task, Action
+from benchmark.tau_bench.tau_types import Task, Action
 from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor
 
